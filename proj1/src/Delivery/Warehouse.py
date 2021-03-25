@@ -1,8 +1,8 @@
-from Delivery.Positionable import Positionable
+from Delivery.ProductContainer import ProductContainer
 
 
-class Warehouse(Positionable):
+class Warehouse(ProductContainer):
     def __init__(self, id, position, products):
         super().__init__(position)
         self.id = id
-        self.products = products
+        self._products = products

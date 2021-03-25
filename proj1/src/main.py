@@ -5,6 +5,7 @@ from Delivery.Warehouse import *
 from Delivery.Drone import *
 from Delivery.Order import *
 from Delivery.Simulation import *
+from Evaluate import evaluate, fileToCommands
 
 def parseInput(path):
     with open(path) as f:
@@ -44,4 +45,10 @@ def parseInput(path):
     return Simulation(max_turns, num_rows, num_cols, products, drones, orders, warehouses)
 
 
-print(parseInput("./input/busy_day.in"))
+simulation = parseInput("./input/example.in")
+
+commands = fileToCommands("./output/example.out")
+
+score = evaluate(len(simulation.drones), simulation.max_turns, simulation.drones[0].max_capacity, simulation.warehouses, simulation.orders, simulation.products, commands)
+
+print(score)
