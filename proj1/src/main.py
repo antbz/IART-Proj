@@ -39,9 +39,9 @@ def parseInput(path):
             num_products_in_order = int(f.readline())
             order_products = [products[x] for x in list(map(int, f.readline().split(" ")))]
             assert num_products_in_order == len(order_products)
-            orders.append(Order(id=i, destination=(x, y), products=dict(Counter(order_products))))
+            orders.append(Order(id=i, position=(x, y), products=dict(Counter(order_products))))
 
     return Simulation(max_turns, num_rows, num_cols, products, drones, orders, warehouses)
 
 
-print(parseInput("../input/busy_day.in"))
+print(parseInput("./input/busy_day.in"))
