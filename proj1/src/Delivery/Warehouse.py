@@ -6,3 +6,6 @@ class Warehouse(ProductContainer):
         super().__init__(position)
         self.id = id
         self._products = products
+
+    def __repr__(self):
+        return f"Warehouse(id: {self.id}; products: {self.products})"
