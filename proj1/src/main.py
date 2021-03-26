@@ -46,12 +46,16 @@ def parseInput(path):
     return Simulation(max_turns, num_rows, num_cols, products, drones, orders, warehouses)
 
 
-simulation = parseInput("../input/example.in")
+simulation = parseInput("./input/example.in")
 print(simulation)
 
+simulation.greedySolve()
 
-commands = fileToCommands("../output/example.out")
 
-score = evaluate(len(simulation.drones), simulation.max_turns, simulation.drones[0].max_capacity, simulation.warehouses, simulation.orders, simulation.products, commands)
 
-print(score)
+
+# commands = fileToCommands("../output/example.out")
+
+# score = evaluate(len(simulation.drones), simulation.max_turns, simulation.drones[0].max_capacity, simulation.warehouses, simulation.orders, simulation.products, commands)
+
+# print(score)

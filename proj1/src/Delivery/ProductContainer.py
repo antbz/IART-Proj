@@ -5,8 +5,8 @@ from Delivery.Product import Product
 
 
 class ProductContainer(Positionable):
-    def __init__(self, position: Tuple):
-        super().__init__(position)
+    def __init__(self, id, position: Tuple):
+        super().__init__(id, position)
         self._products: Dict[Product, int] = {}
 
     @property

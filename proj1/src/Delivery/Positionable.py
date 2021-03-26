@@ -1,9 +1,12 @@
 from math import ceil, dist
 from typing import List, Tuple
 
+from Delivery.Obj import Obj
 
-class Positionable:
-    def __init__(self, position: Tuple):
+
+class Positionable(Obj):
+    def __init__(self, id, position: Tuple):
+        super().__init__(id)
         self.position = position
 
     def getX(self) -> int:
