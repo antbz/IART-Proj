@@ -5,13 +5,12 @@ from Delivery.Product import *
 from Delivery.Warehouse import *
 from Delivery.Drone import *
 from Delivery.Order import *
-from Delivery.Simulation import *
 
 
 def evaluate(num_drones, max_time, max_cargo, wh_list, order_list, product_list, commands):
     warehouses: Dict[int, Warehouse] = {w.id: w for w in wh_list}
-    orders: Dict[int, Order] = {x.id: x for x in order_list}
-    products: Dict[int, Product] = {x.id: x for x in product_list}
+    orders: Dict[int, Order] = {o.id: o for o in order_list}
+    products: Dict[int, Product] = {p.id: p for p in product_list}
     drones: Dict[int, Drone] = {
         i: Drone(id=i, position=warehouses[0].position, max_capacity=max_cargo)
         for i in range(num_drones)
@@ -65,7 +64,7 @@ def evaluate(num_drones, max_time, max_cargo, wh_list, order_list, product_list,
 
             drone_to_delivery_time[drone] += drone.distanceTo(order) + 1
             drone.set_position(order.position)
-            order_to_delivery_time[order].append(drone_to_delivery_time[drone])
+            order_to_delivery_time[order].append(drone_to_delivery_time[drone]-1)
 
             if order.is_complete():
                 delivery_time = max(order_to_delivery_time[order])
@@ -91,6 +90,3 @@ def fileToCommands(path):
         for i in range(1, num_lines + 1):
             commands.append(lines[i].strip())
     return commands
-
-
-fileToCommands("../output/example.out")
