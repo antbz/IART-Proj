@@ -3,10 +3,11 @@ from typing import Dict, Tuple
 from Delivery.Positionable import Positionable
 from Delivery.Product import Product
 
+
 class ProductContainer(Positionable):
     def __init__(self, position: Tuple):
         super().__init__(position)
-        self._products : Dict[Product, int] = {}
+        self._products: Dict[Product, int] = {}
 
     @property
     def products(self):

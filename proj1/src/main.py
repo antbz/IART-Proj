@@ -1,18 +1,19 @@
 from collections import Counter
 
-from Delivery.Product import *
-from Delivery.Warehouse import *
 from Delivery.Drone import *
 from Delivery.Order import *
+from Delivery.Product import *
 from Delivery.Simulation import *
-from Evaluate import evaluate, fileToCommands
+from Delivery.Warehouse import *
+from Evaluate import fileToCommands, evaluate
+
 
 def parseInput(path):
     with open(path) as f:
         num_rows, num_cols, num_drones, max_turns, max_capacity = map(
             int, f.readline().split(" ")
         )
-       
+
         # Read products
         num_products = int(f.readline())
         product_weights = list(map(int, f.readline().split(" ")))
@@ -45,9 +46,11 @@ def parseInput(path):
     return Simulation(max_turns, num_rows, num_cols, products, drones, orders, warehouses)
 
 
-simulation = parseInput("./input/example.in")
+simulation = parseInput("../input/example.in")
+print(simulation)
 
-commands = fileToCommands("./output/example.out")
+
+commands = fileToCommands("../output/example.out")
 
 score = evaluate(len(simulation.drones), simulation.max_turns, simulation.drones[0].max_capacity, simulation.warehouses, simulation.orders, simulation.products, commands)
 
