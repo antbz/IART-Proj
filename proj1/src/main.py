@@ -47,15 +47,5 @@ def parseInput(path):
 
 
 simulation = parseInput("./input/example.in")
-print(simulation)
 
 simulation.greedySolve()
-
-
-
-
-# commands = fileToCommands("../output/example.out")
-
-# score = evaluate(len(simulation.drones), simulation.max_turns, simulation.drones[0].max_capacity, simulation.warehouses, simulation.orders, simulation.products, commands)
-
-# print(score)
