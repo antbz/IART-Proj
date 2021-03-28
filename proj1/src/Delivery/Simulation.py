@@ -60,7 +60,7 @@ class Simulation:
             if not order.is_complete():
                 for wh in self.warehouses:
                     shipment = Shipment(drone, order, wh)
-                    if shipment.hasProducts():
+                    if shipment.hasProducts() and drone.turn + shipment.turns <= self.max_turns:
                         shipments.append(shipment)
         if len(shipments) == 0:
             return 0
