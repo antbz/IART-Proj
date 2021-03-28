@@ -24,6 +24,14 @@ class Shipment:
     def __repr__(self):
         return f"Shipment(drone: {self.drone.id}; warehouse: {self.warehouse.id}; order: {self.order.id}; products: {self.products})"
     
+    @property
+    def commands(self):
+        load, deliver = [], []
+        for p, q in self.products.items():
+            load.append(Command("L", self.drone, self.warehouse, p, q))
+            deliver.append(Command("D", self.drone, self.order, p, q))
+        return load + deliver
+
     def fill(self):
         prods : List[Tuple[Product, int]] = []
         for product, quantity in self.order.products.items():
@@ -64,10 +72,5 @@ class Shipment:
         self.warehouse.remove_products(self.products)
         self.order.remove_products(self.products)
         self.drone.set_position(self.order.position)
-        # TODO add shipments instead of commands
-        load, deliver = [], []
-        for p, q in self.products.items():
-            load.append(Command("L", self.drone, self.warehouse, p, q))
-            deliver.append(Command("D", self.drone, self.order, p, q))
-        self.drone.append_commands(load + deliver)
+        self.drone.add_shipment(self)
         self.drone.add_turns(self.turns)

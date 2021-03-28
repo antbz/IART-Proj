@@ -8,7 +8,7 @@ class Drone(ProductContainer):
         super().__init__(id, position)
         self.max_capacity = max_capacity
         self.used_capacity = 0
-        self.commands = []
+        self.shipments = []
         self.turn = 0
 
     def __repr__(self):
@@ -17,11 +17,15 @@ class Drone(ProductContainer):
     def set_position(self, position: Tuple):
         self.position = position
 
-    def add_command(self, command):
-        self.commands.append(command)
-    
-    def append_commands(self, commands):
-        self.commands += commands
+    def add_shipment(self, shipment):
+        self.shipments.append(shipment)
+
+    @property
+    def commands(self):
+        commands = []
+        for shipment in self.shipments:
+            commands += shipment.commands
+        return commands
 
     def add_turns(self, turns):
         self.turn += turns
