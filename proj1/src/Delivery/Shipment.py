@@ -20,6 +20,9 @@ class Shipment:
         self.percent = 0
 
         self.fill()
+
+    def __repr__(self):
+        return f"Shipment(drone: {self.drone.id}; warehouse: {self.warehouse.id}; order: {self.order.id}; products: {self.products})"
     
     def fill(self):
         prods : List[Tuple[Product, int]] = []

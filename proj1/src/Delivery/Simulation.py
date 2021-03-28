@@ -1,5 +1,6 @@
 from typing import List
 from copy import deepcopy
+from time import time
 
 from Delivery.Drone import Drone
 from Delivery.Order import Order
@@ -30,15 +31,21 @@ class Simulation:
                f"orders: {self.orders}\n" \
                f"warehouses: {self.warehouses}\n"
     
-    def greedySolve(self):
+    def greedySolve(self, out_file : str):
+        start = time()
         while not self.all_orders_complete():
             attr_count = 0
             for drone in self.drones:
                 attr_count += self.bestShipment(drone)
             if attr_count == 0:
                 break
+        print(f"Solving took: {time() - start}")
         
-        print(self.evaluate())
+        commands = self.getCommands()
+        self.evaluate(commands)
+        with open(out_file, mode='wt') as out:
+            out.write(str(len(commands)))
+            out.writelines(commands)
         
     
     def all_orders_complete(self):
@@ -61,9 +68,11 @@ class Simulation:
         shipments[0].execute()
         return 1
 
-    def evaluate(self):
+    def getCommands(self):
         commands = []
         for drone in self.drones:
             commands += [cmd.command_str for cmd in drone.commands]
-        print(commands)
+        return commands
+
+    def evaluate(self, commands):
         return evaluate(len(self.drones), self.max_turns, self.drones[0].max_capacity, self.i_warehouses, self.i_orders, self.products, commands)

@@ -73,12 +73,13 @@ def evaluate(num_drones, max_time, max_cargo, wh_list, order_list, product_list,
                 if delivery_time < max_time:
                     sc = ceil(100 * (max_time - delivery_time) / max_time)
                     score += sc
-                    print(str(order.id) + " scored: " + str(sc))
+                    # print(str(order.id) + " scored: " + str(sc))
                 else:
                     raise ValueError(f"Command {i}: Run out of time.")
         else:
             raise ValueError(f"Command {i}: Unknown command {str_command}.")
-    print(str(deliv_max))
+    print(f"Max turn: {deliv_max}")
+    print(f"Total score: {score}")
     return score
 
 

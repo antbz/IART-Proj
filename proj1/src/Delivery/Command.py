@@ -13,4 +13,4 @@ class Command:
     
     @property
     def command_str(self):
-        return f"{self.drone.id} {self.type} {self.destination.id} {self.product.id} {self.quantity}"
+        return f"\n{self.drone.id} {self.type} {self.destination.id} {self.product.id} {self.quantity}"

@@ -1,3 +1,4 @@
+import sys
 from collections import Counter
 
 from Delivery.Drone import *
@@ -46,6 +47,9 @@ def parseInput(path):
     return Simulation(max_turns, num_rows, num_cols, products, drones, orders, warehouses)
 
 
-simulation = parseInput("./input/example.in")
 
-simulation.greedySolve()
+if (len(sys.argv) != 3):
+    raise ValueError("Invalid arguments\nUsage: python main.py <input_file>.in <output_file>.out")
+
+simulation = parseInput(sys.argv[1])
+simulation.greedySolve(sys.argv[2])
