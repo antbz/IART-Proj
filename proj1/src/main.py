@@ -48,8 +48,14 @@ def parseInput(path):
 
 
 
-if (len(sys.argv) != 3):
-    raise ValueError("Invalid arguments\nUsage: python main.py <input_file>.in <output_file>.out")
+if (len(sys.argv) != 4):
+    raise ValueError("Invalid arguments\nUsage: python main.py <mode> <input_file>.in <output_file>.out")
 
-simulation = parseInput(sys.argv[1])
-simulation.greedySolve(sys.argv[2])
+simulation = parseInput(sys.argv[2])
+
+if sys.argv[1] == "solve":
+    simulation.greedySolve(sys.argv[3])
+elif sys.argv[1] == "eval":
+    evaluate(len(simulation.drones), simulation.max_turns, 
+    simulation.drones[0].max_capacity, simulation.i_warehouses,
+    simulation.i_orders, simulation.products, fileToCommands(sys.argv[3]))

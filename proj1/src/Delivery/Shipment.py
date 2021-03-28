@@ -64,6 +64,8 @@ class Shipment:
         self.warehouse.remove_products(self.products)
         self.order.remove_products(self.products)
         self.drone.set_position(self.order.position)
+        load, deliver = [], []
         for p, q in self.products.items():
-            self.drone.add_command(Command("L", self.drone, self.warehouse, p, q))
-            self.drone.add_command(Command("D", self.drone, self.order, p, q))
+            load.append(Command("L", self.drone, self.warehouse, p, q))
+            deliver.append(Command("D", self.drone, self.order, p, q))
+        self.drone.commands += load + deliver
