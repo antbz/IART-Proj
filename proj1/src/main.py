@@ -32,7 +32,7 @@ def parseInput(path):
             warehouses.append(Warehouse(id=i, position=(x, y), products=wh_stock))
 
         # Create drones
-        drones = [Drone(id, max_capacity, warehouses[0].position) for id in range(num_drones)]
+        drones = [Drone(id, max_capacity, max_turns, warehouses[0].position) for id in range(num_drones)]
 
         # order info
         orders = []
@@ -54,7 +54,7 @@ if (len(sys.argv) != 4):
 simulation = parseInput(sys.argv[2])
 
 if sys.argv[1] == "solve":
-    simulation.greedySolve(sys.argv[3])
+    simulation.solve(sys.argv[3], simulation.solveSA)
 elif sys.argv[1] == "eval":
     evaluate(len(simulation.drones), simulation.max_turns, 
     simulation.drones[0].max_capacity, simulation.i_warehouses,

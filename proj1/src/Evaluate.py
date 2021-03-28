@@ -12,7 +12,7 @@ def evaluate(num_drones, max_time, max_cargo, wh_list, order_list, product_list,
     orders: Dict[int, Order] = {o.id: o for o in order_list}
     products: Dict[int, Product] = {p.id: p for p in product_list}
     drones: Dict[int, Drone] = {
-        i: Drone(id=i, position=warehouses[0].position, max_capacity=max_cargo)
+        i: Drone(id=i, position=warehouses[0].position, max_capacity=max_cargo, max_turns=max_time)
         for i in range(num_drones)
     }
 
