@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import DefaultDict, Dict
 from math import ceil
 
@@ -7,14 +8,13 @@ from Delivery.Drone import *
 from Delivery.Order import *
 
 
-def evaluate(num_drones, max_time, max_cargo, wh_list, order_list, product_list, commands):
-    warehouses: Dict[int, Warehouse] = {w.id: w for w in wh_list}
-    orders: Dict[int, Order] = {o.id: o for o in order_list}
-    products: Dict[int, Product] = {p.id: p for p in product_list}
-    drones: Dict[int, Drone] = {
-        i: Drone(id=i, position=warehouses[0].position, max_capacity=max_cargo, max_turns=max_time)
-        for i in range(num_drones)
-    }
+def evaluate(simulation, commands):
+    warehouses: Dict[int, Warehouse] = { w.id: w for w in deepcopy(simulation.i_warehouses) }
+    orders: Dict[int, Order] = { o.id: o for o in deepcopy(simulation.i_orders) }
+    drones: Dict[int, Drone] = { d.id : d for d in deepcopy(simulation.i_drones) }
+    products: Dict[int, Product] = { p.id: p for p in simulation.products }
+    max_cargo = simulation.max_cargo
+    max_turns = simulation.max_turns
 
     drone_to_delivery_time: Dict[Drone, int] = DefaultDict(int)
     order_to_delivery_time: Dict[Order, list] = DefaultDict(list)
@@ -70,16 +70,16 @@ def evaluate(num_drones, max_time, max_cargo, wh_list, order_list, product_list,
                 delivery_time = max(order_to_delivery_time[order])
                 if delivery_time > deliv_max:
                     deliv_max = delivery_time
-                if delivery_time < max_time:
-                    sc = ceil(100 * (max_time - delivery_time) / max_time)
+                if delivery_time < max_turns:
+                    sc = ceil(100 * (max_turns - delivery_time) / max_turns)
                     score += sc
-                    # print(str(order.id) + " scored: " + str(sc))
                 else:
                     raise ValueError(f"Command {i}: Run out of time.")
         else:
             raise ValueError(f"Command {i}: Unknown command {str_command}.")
     print(f"Max turn: {deliv_max}")
     print(f"Total score: {score}")
+    print(f"Average score: {score/len(orders)}")
     return score
 
 

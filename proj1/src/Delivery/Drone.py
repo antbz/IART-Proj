@@ -32,7 +32,6 @@ class Drone(ProductContainer):
     def add_turns(self, turns):
         self.turn += turns
     
-    # TODO add methods to transfer shipments between drones
     def swap_with(self, drone : "Drone"):
         for i in range(len(self.shipments) * len(drone.shipments)):
             s1_idx = randrange(len(self.shipments))

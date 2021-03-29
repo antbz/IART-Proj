@@ -16,8 +16,11 @@ class Simulation:
         self.max_turns = max_turns
         self.num_rows = num_rows
         self.num_cols = num_cols
+        self.num_drones = len(drones)
+        self.max_cargo = drones[0].max_capacity
         self.products = products
         self.drones : List[Drone] = drones
+        self.i_drones : List[Drone] = deepcopy(drones)
         self.orders : List[Order] = orders
         self.i_orders : List[Order] = deepcopy(orders)
         self.warehouses : List[Warehouse] = warehouses
@@ -122,4 +125,4 @@ class Simulation:
         return commands
 
     def evaluate(self, commands):
-        return evaluate(len(self.drones), self.max_turns, self.drones[0].max_capacity, deepcopy(self.i_warehouses), deepcopy(self.i_orders), self.products, commands)
+        return evaluate(self, commands)

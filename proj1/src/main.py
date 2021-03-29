@@ -56,6 +56,4 @@ simulation = parseInput(sys.argv[2])
 if sys.argv[1] == "solve":
     simulation.solve(sys.argv[3], simulation.solveSA)
 elif sys.argv[1] == "eval":
-    evaluate(len(simulation.drones), simulation.max_turns, 
-    simulation.drones[0].max_capacity, simulation.i_warehouses,
-    simulation.i_orders, simulation.products, fileToCommands(sys.argv[3]))
+    evaluate(simulation, fileToCommands(sys.argv[3]))
