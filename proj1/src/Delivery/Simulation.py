@@ -1,4 +1,4 @@
-from math import exp
+from math import exp, log
 from typing import List
 from copy import deepcopy
 from time import time
@@ -61,15 +61,29 @@ class Simulation:
 
         self.best = self.evaluate(self.getCommands())
 
-        for t in range(100):
+        for t in range(300):
             T = self.cooldown(T0, t)
             new_score, new_drones = self.random_neighbor()
             if (new_score > self.best or exp((new_score - self.best) / T) >= random()):
+                print(f"New score: {new_score}")
                 self.drones = new_drones
                 self.best = new_score
 
     def cooldown(self, T0, t):
-        return T0 / (1 + 0.05 * t ** 2)
+        return self.quadratic_cooling(T0, t)
+
+    def exponential_cooling(self, T0, t):
+        return T0 * 0.8 ** t
+    
+    def log_cooling(self, T0, t):
+        return T0 / (1 + log(1 + t))
+
+    def linear_cooling(self, T0, t):
+        return T0 / (1 + t)
+    
+    def quadratic_cooling(self, T0, t):
+        return T0 / (1 + t ** 2)
+    
 
     def random_neighbor(self):
         if len(self.drones) == 1:
