@@ -2,7 +2,7 @@ from copy import deepcopy
 from math import exp, log
 from random import random, choices
 
-from Delivery.Mutations import swap_drones
+from Delivery.Mutations import swap_drones, change_sh_drone
 from Delivery.Simulation import Simulation
 
 MAX_ITER = 10000
@@ -56,10 +56,16 @@ class SASimulation(Simulation):
         mutated_sh = deepcopy(self.shipments)
 
         for i in range(10):
-            sh1, sh2 = choices(mutated_sh, k=2)
-
-            if (swap_drones(sh1, sh2)):
-                score = self.evaluate_shipments(mutated_sh)[0]
-                return score, mutated_sh
+            if random() >= 0.5:
+                sh1, sh2 = choices(mutated_sh, k=2)
+                if swap_drones(sh1, sh2):
+                    score = self.evaluate_shipments(mutated_sh)[0]
+                    return score, mutated_sh
+            else:
+                sh = choices(mutated_sh)[0]
+                d = choices(self.drones)[0]
+                if change_sh_drone(sh, d):
+                    score = self.evaluate_shipments(mutated_sh)[0]
+                    return score, mutated_sh
 
         return self.current, mutated_sh
