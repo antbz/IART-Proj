@@ -54,6 +54,6 @@ if (len(sys.argv) != 4):
 simulation = parseInput(sys.argv[2])
 
 if sys.argv[1] == "solve":
-    simulation.solve(sys.argv[3], simulation.solveSA)
+    simulation.solve(sys.argv[3], simulation.solveGreedy)
 elif sys.argv[1] == "eval":
     evaluate(simulation, fileToCommands(sys.argv[3]))

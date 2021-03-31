@@ -1,29 +1,31 @@
 from collections import defaultdict
 from typing import Dict, List, Tuple
 
+from ortools.algorithms import pywrapknapsack_solver
+
+from Delivery.Command import Command
 from Delivery.Drone import Drone
 from Delivery.Order import Order
 from Delivery.Product import Product
 from Delivery.Warehouse import Warehouse
-from Delivery.Command import Command
 
 
 class Shipment:
-    def __init__(self, drone : Drone, order : Order, warehouse : Warehouse):
+    def __init__(self, drone: Drone, order: Order, warehouse: Warehouse):
         self.drone = drone
         self.order = order
         self.warehouse = warehouse
-        self.products : Dict[Product, int] = {}
+        self.products: Dict[Product, int] = {}
         self.product_weight = 0
         self.turns = 0
         self.score = 0
         self.percent = 0
 
-        self.fill()
+        self.knapsack()
 
     def __repr__(self):
         return f"Shipment(drone: {self.drone.id}; warehouse: {self.warehouse.id}; order: {self.order.id}; products: {self.products})"
-    
+
     @property
     def commands(self):
         load, deliver = [], []
@@ -33,17 +35,15 @@ class Shipment:
         return load + deliver
 
     def fill(self):
-        prods : List[Tuple[Product, int]] = []
+        prods: List[Tuple[Product, int]] = []
         for product, quantity in self.order.products.items():
             available = min(quantity, self.warehouse.products.get(product, 0))
-            if (available  > 0):
+            if (available > 0):
                 prods.append((product, available))
-        
-        # TODO improve this, possibly adding knapsack solver
 
-        prods = sorted(prods, key= lambda x : -x[0].weight)
+        prods = sorted(prods, key=lambda x: -x[0].weight)
         capacity = self.drone.max_capacity
-        carrying : Dict[Product, int] = defaultdict(int)
+        carrying: Dict[Product, int] = defaultdict(int)
         for p, q in prods:
             while q > 0:
                 if p.weight <= capacity:
@@ -52,10 +52,47 @@ class Shipment:
                     q -= 1
                 else:
                     break
-        
+
         self.products = carrying
         self.product_weight = sum(p.weight * q for p, q in self.products.items())
         self.percent = self.product_weight / self.order.product_weight
+
+        self.calculateScore()
+
+    def knapsack(self):
+        prods = []
+        values = []
+        weights = [[]]
+        capacity = [self.drone.max_capacity]
+
+        for product, quantity in self.order.products.items():
+            available = min(quantity, self.warehouse.products.get(product, 0))
+            for q in range(available):
+                prods.append(product)
+                values.append(product.weight)
+                weights[0].append(product.weight)
+
+        solver = pywrapknapsack_solver.KnapsackSolver(
+            pywrapknapsack_solver.KnapsackSolver.
+                KNAPSACK_64ITEMS_SOLVER, 'KnapsackExample')
+
+        solver.Init(values, weights, capacity)
+        solver.Solve()
+
+        total_weight = 0
+        carrying: Dict[Product, int] = defaultdict(int)
+
+        for i in range(len(values)):
+            if solver.BestSolutionContains(i):
+                product = prods[i]
+                if carrying.__contains__(product):
+                    carrying[product] += 1
+                else:
+                    carrying[product] = 1
+                total_weight += weights[0][i]
+
+        self.products = carrying
+        self.percent = total_weight / self.order.product_weight
 
         self.calculateScore()
 
@@ -67,7 +104,7 @@ class Shipment:
 
     def hasProducts(self):
         return len(self.products) > 0
-    
+
     def execute(self):
         self.warehouse.remove_products(self.products)
         self.order.remove_products(self.products)
