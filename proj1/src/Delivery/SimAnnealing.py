@@ -15,18 +15,24 @@ class SASimulation(Simulation):
     def algorithm(self):
         T0 = 100
 
-        self.best = self.evaluate()[0]
-        print(f"Initial: {self.best}")
+        self.current = self.evaluate()[0]
+        initial_sh = deepcopy(self.shipments)
+        best = self.current
+        print(f"Initial: {best}")
 
         for t in range(MAX_ITER):
             T = self.cooldown(T0, t)
             if T < 1e-3:
                 break
             new_score, new_shipments = self.random_neighbor()
-            if (new_score > self.best or exp((new_score - self.best) / T) >= random()):
+            if (new_score > self.current or exp((new_score - self.current) / T) >= random()):
                 print(f"New score: {new_score}")
                 self.shipments = new_shipments
-                self.best = new_score
+                self.current = new_score
+
+        if self.current < best:
+            self.shipments = initial_sh
+
 
     def cooldown(self, T0, t):
         return self.quadratic_cooling(T0, t)
@@ -56,4 +62,4 @@ class SASimulation(Simulation):
                 score = self.evaluate_shipments(mutated_sh)[0]
                 return score, mutated_sh
 
-        return self.best, mutated_sh
+        return self.current, mutated_sh
