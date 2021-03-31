@@ -1,10 +1,8 @@
-from math import exp, log
-from typing import List
 from copy import deepcopy
 from time import time
-from random import random, randrange
-from Delivery.Command import Command
+from typing import List
 
+from Delivery.Command import Command
 from Delivery.Drone import Drone
 from Delivery.Order import Order
 from Delivery.Shipment import Shipment
@@ -20,12 +18,13 @@ class Simulation:
         self.num_drones = len(drones)
         self.max_cargo = drones[0].max_capacity
         self.products = products
-        self.drones : List[Drone] = drones
-        self.i_drones : List[Drone] = deepcopy(drones)
-        self.orders : List[Order] = orders
-        self.i_orders : List[Order] = deepcopy(orders)
-        self.warehouses : List[Warehouse] = warehouses
-        self.i_warehouses : List[Warehouse] = deepcopy(warehouses)
+        self.drones: List[Drone] = drones
+        self.i_drones: List[Drone] = deepcopy(drones)
+        self.orders: List[Order] = orders
+        self.i_orders: List[Order] = deepcopy(orders)
+        self.warehouses: List[Warehouse] = warehouses
+        self.i_warehouses: List[Warehouse] = deepcopy(warehouses)
+        self.shipments: List[Shipment] = []
 
     def __str__(self):
         return f"Simulation\n" \
@@ -37,7 +36,7 @@ class Simulation:
                f"orders: {self.orders}\n" \
                f"warehouses: {self.warehouses}\n"
 
-    def solve(self, out_file : str):
+    def solve(self, out_file: str):
         start = time()
         self.algorithm()
         print(f"Solving took: {time() - start}")
@@ -52,30 +51,28 @@ class Simulation:
             out.writelines(self.commands)
 
     def getCommands(self):
+        return self.getCommandsFromShipments(self.shipments)
+
+    def getCommandsFromShipments(self, shipments: List[Shipment]):
         commands = []
-        for drone in self.drones:
-            commands += [cmd.command_str for cmd in drone.commands]
-        return commands
-    
-    def getCommandsFromDrones(self, drones):
-        commands = []
-        for drone in drones:
-            commands += [cmd.command_str for cmd in drone.commands]
+        for shipment in shipments:
+            commands += [cmd.command_str for cmd in shipment.commands]
         return commands
 
     def evaluate(self):
         self.commands = self.getCommands()
         return evaluate(self, self.commands)
 
-    def evaluate_drones(self, drones):
-        return evaluate(self, self.getCommandsFromDrones(drones))
+    def evaluate_shipments(self, shipments):
+        return evaluate(self, self.getCommandsFromShipments(shipments))
 
-    def execute_commands(self, commands : List[str]):
+    def execute_commands(self, commands: List[str]):
         current_sh = []
         for cmd in [c.split() for c in commands]:
             if cmd[1] == 'L' and len(current_sh) != 0 and current_sh[-1].type == 'D':
                 shipment = Shipment.fromcommands(current_sh)
                 shipment.execute()
+                self.shipments.append(shipment)
                 current_sh.clear()
             if cmd[1] == 'L':
                 current_sh.append(Command('L', self.drones[int(cmd[0])], self.warehouses[int(cmd[2])], self.products[int(cmd[3])], int(cmd[4])))
@@ -83,3 +80,4 @@ class Simulation:
                 current_sh.append(Command('D', self.drones[int(cmd[0])], self.orders[int(cmd[2])], self.products[int(cmd[3])], int(cmd[4])))
         shipment = Shipment.fromcommands(current_sh)
         shipment.execute()
+        self.shipments.append(shipment)

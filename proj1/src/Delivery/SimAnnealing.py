@@ -1,10 +1,12 @@
-from math import exp, log
 from copy import deepcopy
-from random import random, randrange
+from math import exp, log
+from random import random, choices
 
+from Delivery.Mutations import swap_drones
 from Delivery.Simulation import Simulation
 
 MAX_ITER = 10000
+
 
 class SASimulation(Simulation):
     def __init__(self, max_turns, num_rows, num_cols, products, drones, orders, warehouses):
@@ -20,10 +22,10 @@ class SASimulation(Simulation):
             T = self.cooldown(T0, t)
             if T < 1e-3:
                 break
-            new_score, new_drones = self.random_neighbor()
+            new_score, new_shipments = self.random_neighbor()
             if (new_score > self.best or exp((new_score - self.best) / T) >= random()):
                 print(f"New score: {new_score}")
-                self.drones = new_drones
+                self.shipments = new_shipments
                 self.best = new_score
 
     def cooldown(self, T0, t):
@@ -31,32 +33,27 @@ class SASimulation(Simulation):
 
     def exponential_cooling(self, T0, t):
         return T0 * 0.8 ** t
-    
+
     def log_cooling(self, T0, t):
         return T0 / (1 + log(1 + t))
 
     def linear_cooling(self, T0, t):
         return T0 / (1 + t)
-    
+
     def quadratic_cooling(self, T0, t):
         return T0 / (1 + t ** 2)
-    
+
     def random_neighbor(self):
         if len(self.drones) == 1:
             raise ValueError("Cannot use permutation on single drone solutions")
-        
-        drones = deepcopy(self.drones)
-        
-        for i in range(len(drones)):
-            d1_idx = randrange(len(drones))
-            d1 = drones[d1_idx]
-            for j in range(len(drones)):
-                d2_idx = randrange(len(drones))
-                if (d1_idx == d2_idx):
-                    continue
-                d2 = drones[d2_idx]
-                if (d1.swap_with(d2)):
-                    score = self.evaluate_drones(drones)[0]
-                    return score, drones
 
-        return self.best, drones
+        mutated_sh = deepcopy(self.shipments)
+
+        for i in range(10):
+            sh1, sh2 = choices(mutated_sh, k=2)
+
+            if (swap_drones(sh1, sh2)):
+                score = self.evaluate_shipments(mutated_sh)[0]
+                return score, mutated_sh
+
+        return self.best, mutated_sh

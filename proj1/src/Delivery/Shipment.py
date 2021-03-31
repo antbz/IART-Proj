@@ -12,10 +12,10 @@ from Delivery.Warehouse import Warehouse
 
 class Shipment:
     def __init__(self, drone, order, warehouse, products, product_weight, turns, score, percent) -> None:
-        self.drone = drone
-        self.order = order
-        self.warehouse = warehouse
-        self.products : Dict[Product, int] = products
+        self.drone: Drone = drone
+        self.order: Order = order
+        self.warehouse: Warehouse = warehouse
+        self.products: Dict[Product, int] = products
         self.product_weight = product_weight
         self.turns = turns
         self.score = score
@@ -25,7 +25,7 @@ class Shipment:
         return f"Shipment(drone: {self.drone.id}; warehouse: {self.warehouse.id}; order: {self.order.id}; products: {self.products})"
 
     @classmethod
-    def fromcommands(cls, commands : List[Command]):
+    def fromcommands(cls, commands: List[Command]):
         drone = commands[0].drone
         order = commands[-1].destination
         wh = commands[0].destination
@@ -33,14 +33,14 @@ class Shipment:
         for cmd in commands:
             if cmd.type == 'D':
                 break
-            products.update({cmd.product : cmd.quantity})
+            products.update({cmd.product: cmd.quantity})
 
         sh = cls(drone, order, wh, products, 0, 0, 0, 0)
         sh.calculateScore()
         return sh
 
     @classmethod
-    def fromdow(cls, drone : Drone, order : Order, warehouse : Warehouse):
+    def fromdow(cls, drone: Drone, order: Order, warehouse: Warehouse):
         sh = cls(drone, order, warehouse, {}, 0, 0, 0, 0)
         sh.fill()
         return sh
@@ -128,5 +128,4 @@ class Shipment:
         self.warehouse.remove_products(self.products)
         self.order.remove_products(self.products)
         self.drone.set_position(self.order.position)
-        self.drone.add_shipment(self)
         self.drone.add_turns(self.turns)
