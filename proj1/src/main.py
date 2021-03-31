@@ -2,8 +2,10 @@ import sys
 from collections import Counter
 
 from Delivery.Drone import *
+from Delivery.Greedy import GreedySimulation
 from Delivery.Order import *
 from Delivery.Product import *
+from Delivery.SimAnnealing import SASimulation
 from Delivery.Simulation import *
 from Delivery.Warehouse import *
 from Evaluate import fileToCommands, evaluate
@@ -48,12 +50,17 @@ def parseInput(path):
 
 
 
-if (len(sys.argv) != 4):
-    raise ValueError("Invalid arguments\nUsage: python main.py <mode> <input_file>.in <output_file>.out")
+if (len(sys.argv) < 4):
+    raise ValueError("Invalid arguments\nUsage: python main.py <mode> <input_file>.in <output_file>.out <initial_sol>.out")
 
 simulation = parseInput(sys.argv[2])
+simulation.__class__ = SASimulation
 
 if sys.argv[1] == "solve":
-    simulation.solve(sys.argv[3], simulation.solveGreedy)
+    simulation.execute_commands(fileToCommands(sys.argv[4]))
+    simulation.solve(sys.argv[3])
 elif sys.argv[1] == "eval":
-    evaluate(simulation, fileToCommands(sys.argv[3]))
+    score, max_turn, average = evaluate(simulation, fileToCommands(sys.argv[3]))
+    print(f"Total score: {score}")
+    print(f"Number of turns: {max_turn}")
+    print(f"Average score: {average}")

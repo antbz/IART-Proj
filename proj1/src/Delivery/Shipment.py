@@ -11,20 +11,39 @@ from Delivery.Warehouse import Warehouse
 
 
 class Shipment:
-    def __init__(self, drone: Drone, order: Order, warehouse: Warehouse):
+    def __init__(self, drone, order, warehouse, products, product_weight, turns, score, percent) -> None:
         self.drone = drone
         self.order = order
         self.warehouse = warehouse
-        self.products: Dict[Product, int] = {}
-        self.product_weight = 0
-        self.turns = 0
-        self.score = 0
-        self.percent = 0
-
-        self.knapsack()
+        self.products : Dict[Product, int] = products
+        self.product_weight = product_weight
+        self.turns = turns
+        self.score = score
+        self.percent = percent
 
     def __repr__(self):
         return f"Shipment(drone: {self.drone.id}; warehouse: {self.warehouse.id}; order: {self.order.id}; products: {self.products})"
+
+    @classmethod
+    def fromcommands(cls, commands : List[Command]):
+        drone = commands[0].drone
+        order = commands[-1].destination
+        wh = commands[0].destination
+        products = {}
+        for cmd in commands:
+            if cmd.type == 'D':
+                break
+            products.update({cmd.product : cmd.quantity})
+
+        sh = cls(drone, order, wh, products, 0, 0, 0, 0)
+        sh.calculateScore()
+        return sh
+
+    @classmethod
+    def fromdow(cls, drone : Drone, order : Order, warehouse : Warehouse):
+        sh = cls(drone, order, warehouse, {}, 0, 0, 0, 0)
+        sh.fill()
+        return sh
 
     @property
     def commands(self):
@@ -54,8 +73,6 @@ class Shipment:
                     break
 
         self.products = carrying
-        self.product_weight = sum(p.weight * q for p, q in self.products.items())
-        self.percent = self.product_weight / self.order.product_weight
 
         self.calculateScore()
 
@@ -97,6 +114,8 @@ class Shipment:
         self.calculateScore()
 
     def calculateScore(self):
+        self.product_weight = sum(p.weight * q for p, q in self.products.items())
+        self.percent = self.product_weight / self.order.product_weight
         dw = self.drone.distanceTo(self.warehouse)
         do = self.warehouse.distanceTo(self.order)
         self.turns = dw + do + len(self.products) * 2

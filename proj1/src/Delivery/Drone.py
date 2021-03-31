@@ -14,7 +14,7 @@ class Drone(ProductContainer):
         self.turn = 0
 
     def __repr__(self):
-        return f"Drone(id: {self.id}; position: {self.position}; max_capacity: {self.max_capacity}; products: {self.products}) "
+        return f"Drone(id: {self.id}; position: {self.position}; max_capacity: {self.max_capacity}; products: {self.products} shipments: {self.shipments}); "
 
     def set_position(self, position: Tuple):
         self.position = position
