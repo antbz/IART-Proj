@@ -3,6 +3,7 @@ from typing import List
 from copy import deepcopy
 from time import time
 from random import random, randrange
+from Delivery.Command import Command
 
 from Delivery.Drone import Drone
 from Delivery.Order import Order
@@ -36,95 +37,19 @@ class Simulation:
                f"orders: {self.orders}\n" \
                f"warehouses: {self.warehouses}\n"
 
-    def solve(self, out_file : str, algorithm):
+    def solve(self, out_file : str):
         start = time()
-        algorithm()
+        self.algorithm()
         print(f"Solving took: {time() - start}")
 
-        commands = self.getCommands()
-        self.evaluate(commands)
+        score, max_turn, average = self.evaluate()
+        print(f"Total score: {score}")
+        print(f"Number of turns: {max_turn}")
+        print(f"Average score: {average}")
+
         with open(out_file, mode='wt') as out:
-            out.write(str(len(commands)))
-            out.writelines(commands)
-    
-    def solveGreedy(self):
-        while not self.all_orders_complete():
-            attr_count = 0
-            for drone in self.drones:
-                attr_count += self.bestShipment(drone)
-            if attr_count == 0:
-                break
-        
-    def solveSA(self):
-        self.solveGreedy()
-        T0 = 100
-
-        self.best = self.evaluate(self.getCommands())
-
-        for t in range(300):
-            T = self.cooldown(T0, t)
-            new_score, new_drones = self.random_neighbor()
-            if (new_score > self.best or exp((new_score - self.best) / T) >= random()):
-                print(f"New score: {new_score}")
-                self.drones = new_drones
-                self.best = new_score
-
-    def cooldown(self, T0, t):
-        return self.quadratic_cooling(T0, t)
-
-    def exponential_cooling(self, T0, t):
-        return T0 * 0.8 ** t
-    
-    def log_cooling(self, T0, t):
-        return T0 / (1 + log(1 + t))
-
-    def linear_cooling(self, T0, t):
-        return T0 / (1 + t)
-    
-    def quadratic_cooling(self, T0, t):
-        return T0 / (1 + t ** 2)
-    
-
-    def random_neighbor(self):
-        if len(self.drones) == 1:
-            raise ValueError("Cannot use permutation on single drone solutions")
-        
-        drones = deepcopy(self.drones)
-        
-        for i in range(len(drones)):
-            d1_idx = randrange(len(drones))
-            d1 = drones[d1_idx]
-            for j in range(len(drones)):
-                d2_idx = randrange(len(drones))
-                if (d1_idx == d2_idx):
-                    continue
-                d2 = drones[d2_idx]
-                if (d1.swap_with(d2)):
-                    score = self.evaluate(self.getCommandsFromDrones(drones))
-                    return score, drones
-
-        return self.best, drones
-
-    
-    def all_orders_complete(self):
-        for order in self.orders:
-            if not order.is_complete():
-                return False
-        return True
-
-    def bestShipment(self, drone : Drone):
-        shipments : List[Shipment] = []
-        for order in self.orders:
-            if not order.is_complete():
-                for wh in self.warehouses:
-                    shipment = Shipment(drone, order, wh)
-                    if shipment.hasProducts() and drone.turn + shipment.turns <= self.max_turns:
-                        shipments.append(shipment)
-        if len(shipments) == 0:
-            return 0
-        shipments = sorted(shipments, key=lambda sh : -sh.score)
-        shipments[0].execute()
-        return 1
+            out.write(str(len(self.commands)))
+            out.writelines(self.commands)
 
     def getCommands(self):
         commands = []
@@ -138,5 +63,23 @@ class Simulation:
             commands += [cmd.command_str for cmd in drone.commands]
         return commands
 
-    def evaluate(self, commands):
-        return evaluate(self, commands)
+    def evaluate(self):
+        self.commands = self.getCommands()
+        return evaluate(self, self.commands)
+
+    def evaluate_drones(self, drones):
+        return evaluate(self, self.getCommandsFromDrones(drones))
+
+    def execute_commands(self, commands : List[str]):
+        current_sh = []
+        for cmd in [c.split() for c in commands]:
+            if cmd[1] == 'L' and len(current_sh) != 0 and current_sh[-1].type == 'D':
+                shipment = Shipment.fromcommands(current_sh)
+                shipment.execute()
+                current_sh.clear()
+            if cmd[1] == 'L':
+                current_sh.append(Command('L', self.drones[int(cmd[0])], self.warehouses[int(cmd[2])], self.products[int(cmd[3])], int(cmd[4])))
+            elif cmd[1] == 'D':
+                current_sh.append(Command('D', self.drones[int(cmd[0])], self.orders[int(cmd[2])], self.products[int(cmd[3])], int(cmd[4])))
+        shipment = Shipment.fromcommands(current_sh)
+        shipment.execute()
