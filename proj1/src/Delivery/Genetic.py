@@ -1,6 +1,6 @@
 from copy import deepcopy
 from typing import List
-from random import choice
+from random import choice, sample
 from Delivery.Chromosome import Chromosome
 from Delivery.Drone import Drone
 from Delivery.Shipment import Shipment
@@ -13,7 +13,7 @@ class GeneticSimulation(Simulation):
 
     def generate_population(self):
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            future_list = [executor.submit(self.generate_chromosome) for i in range(10)]
+            future_list = [executor.submit(self.generate_chromosome) for i in range(100)]
             self.population = [f.result() for f in concurrent.futures.as_completed(future_list)]
             print(len(self.population))
             self.chromosome = self.population[0]
@@ -35,10 +35,11 @@ class GeneticSimulation(Simulation):
 
     def randomShipment(self, chromosome : Chromosome, drone: Drone):
         order = choice(chromosome.incomplete_orders)
-        possible_sh = [sh for wh in chromosome.warehouses if (sh := Shipment.fromdow(drone, order, wh)).hasProducts()]
-        if len(possible_sh) == 0:
-            return 0
-        shipment = choice(possible_sh)
-        shipment.execute()
-        chromosome.shipments.append(shipment)
-        return 1
+        wh_sample = sample(chromosome.warehouses, k=len(chromosome.warehouses))
+        for wh in wh_sample:
+            sh = Shipment.fromdow(drone, order, wh)
+            if sh.hasProducts():
+                sh.execute()
+                chromosome.shipments.append(sh)
+                return 1
+        return 0
