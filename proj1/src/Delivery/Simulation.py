@@ -46,6 +46,9 @@ class Simulation:
         print(f"Number of turns: {max_turn}")
         print(f"Average score: {average}")
 
+        self.write_to_file(out_file)
+
+    def write_to_file(self, out_file):
         with open(out_file, mode='wt') as out:
             out.write(str(len(self.commands)))
             out.writelines(self.commands)

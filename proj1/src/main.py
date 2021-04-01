@@ -5,7 +5,7 @@ from Delivery.Drone import *
 from Delivery.Greedy import GreedySimulation
 from Delivery.Order import *
 from Delivery.Product import *
-from Delivery.Random import RandomSimulation
+from Delivery.Genetic import GeneticSimulation
 from Delivery.SimAnnealing import SASimulation
 from Delivery.Simulation import *
 from Delivery.Warehouse import *
@@ -55,7 +55,7 @@ if (len(sys.argv) < 4):
     raise ValueError("Invalid arguments\nUsage: python main.py <mode> <input_file>.in <output_file>.out <initial_sol>.out")
 
 simulation = parseInput(sys.argv[2])
-simulation.__class__ = RandomSimulation
+simulation.__class__ = GeneticSimulation
 
 if sys.argv[1] == "solve":
     # simulation.execute_commands(fileToCommands(sys.argv[4]))
