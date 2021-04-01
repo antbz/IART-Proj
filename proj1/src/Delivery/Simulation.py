@@ -50,6 +50,15 @@ class Simulation:
             out.write(str(len(self.commands)))
             out.writelines(self.commands)
 
+    def all_orders_complete(self):
+        self.incomplete_orders = []
+        for o in self.orders:
+            if not o.is_complete():
+                self.incomplete_orders.append(o)
+        if len(self.incomplete_orders) == 0:
+            return True
+        return False
+    
     def getCommands(self):
         return self.getCommandsFromShipments(self.shipments)
 

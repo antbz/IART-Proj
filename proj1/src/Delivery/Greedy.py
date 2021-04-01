@@ -17,12 +17,6 @@ class GreedySimulation(Simulation):
             if attr_count == 0:
                 break
 
-    def all_orders_complete(self):
-        for order in self.orders:
-            if not order.is_complete():
-                return False
-        return True
-
     def bestShipment(self, drone: Drone):
         shipments: List[Shipment] = []
         for order in self.orders:
