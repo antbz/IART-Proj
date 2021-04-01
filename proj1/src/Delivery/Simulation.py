@@ -1,6 +1,7 @@
 from copy import deepcopy
 from time import time
 from typing import List
+from Delivery.Chromossome import Chromossome
 
 from Delivery.Command import Command
 from Delivery.Drone import Drone
@@ -18,13 +19,10 @@ class Simulation:
         self.num_drones = len(drones)
         self.max_cargo = drones[0].max_capacity
         self.products = products
-        self.drones: List[Drone] = drones
-        self.i_drones: List[Drone] = deepcopy(drones)
-        self.orders: List[Order] = orders
-        self.i_orders: List[Order] = deepcopy(orders)
-        self.warehouses: List[Warehouse] = warehouses
-        self.i_warehouses: List[Warehouse] = deepcopy(warehouses)
-        self.shipments: List[Shipment] = []
+        self.chromossome : Chromossome = Chromossome(drones, orders, warehouses)
+        self.i_drones: List[Drone] = drones
+        self.i_orders: List[Order] = orders
+        self.i_warehouses: List[Warehouse] = warehouses
 
     def __str__(self):
         return f"Simulation\n" \
@@ -46,50 +44,27 @@ class Simulation:
         print(f"Number of turns: {max_turn}")
         print(f"Average score: {average}")
 
-        self.write_to_file(out_file)
-
-    def write_to_file(self, out_file):
-        with open(out_file, mode='wt') as out:
-            out.write(str(len(self.commands)))
-            out.writelines(self.commands)
-
-    def all_orders_complete(self):
-        self.incomplete_orders = []
-        for o in self.orders:
-            if not o.is_complete():
-                self.incomplete_orders.append(o)
-        if len(self.incomplete_orders) == 0:
-            return True
-        return False
-    
-    def getCommands(self):
-        return self.getCommandsFromShipments(self.shipments)
-
-    def getCommandsFromShipments(self, shipments: List[Shipment]):
-        commands = []
-        for shipment in shipments:
-            commands += [cmd.command_str for cmd in shipment.commands]
-        return commands
+        self.chromossome.write_to_file(out_file)
 
     def evaluate(self):
-        self.commands = self.getCommands()
-        return evaluate(self, self.commands)
+        self.chromossome.getCommands()
+        return evaluate(self, self.chromossome.commands)
 
     def evaluate_shipments(self, shipments):
-        return evaluate(self, self.getCommandsFromShipments(shipments))
-
+        return evaluate(self, self.chromossome.getCommandsFromShipments(shipments))
+    
     def execute_commands(self, commands: List[str]):
         current_sh = []
         for cmd in [c.split() for c in commands]:
             if cmd[1] == 'L' and len(current_sh) != 0 and current_sh[-1].type == 'D':
                 shipment = Shipment.fromcommands(current_sh)
                 shipment.execute()
-                self.shipments.append(shipment)
+                self.chromossome.shipments.append(shipment)
                 current_sh.clear()
             if cmd[1] == 'L':
-                current_sh.append(Command('L', self.drones[int(cmd[0])], self.warehouses[int(cmd[2])], self.products[int(cmd[3])], int(cmd[4])))
+                current_sh.append(Command('L', self.chromossome.drones[int(cmd[0])], self.chromossome.warehouses[int(cmd[2])], self.products[int(cmd[3])], int(cmd[4])))
             elif cmd[1] == 'D':
-                current_sh.append(Command('D', self.drones[int(cmd[0])], self.orders[int(cmd[2])], self.products[int(cmd[3])], int(cmd[4])))
+                current_sh.append(Command('D', self.chromossome.drones[int(cmd[0])], self.chromossome.orders[int(cmd[2])], self.products[int(cmd[3])], int(cmd[4])))
         shipment = Shipment.fromcommands(current_sh)
         shipment.execute()
-        self.shipments.append(shipment)
+        self.chromossome.shipments.append(shipment)

@@ -16,7 +16,7 @@ class SASimulation(Simulation):
         T0 = 100
 
         self.current = self.evaluate()[0]
-        initial_sh = deepcopy(self.shipments)
+        self.current_shipments = deepcopy(self.chromossome.shipments)
         best = self.current
         print(f"Initial: {best}")
 
@@ -24,14 +24,16 @@ class SASimulation(Simulation):
             T = self.cooldown(T0, t)
             if T < 1e-3:
                 break
+
             new_score, new_shipments = self.random_neighbor()
+
             if (new_score > self.current or exp((new_score - self.current) / T) >= random()):
                 print(f"New score: {new_score}")
-                self.shipments = new_shipments
+                self.current_shipments = new_shipments
                 self.current = new_score
-
-        if self.current < best:
-            self.shipments = initial_sh
+            if (new_score > best):
+                best = new_score
+                self.chromossome.shipments = new_shipments
 
 
     def cooldown(self, T0, t):
@@ -50,22 +52,25 @@ class SASimulation(Simulation):
         return T0 / (1 + t ** 2)
 
     def random_neighbor(self):
-        if len(self.drones) == 1:
-            raise ValueError("Cannot use permutation on single drone solutions")
+        if len(self.current_shipments) == 1:
+            raise ValueError("Cannot use permutation on single shipments")
 
-        mutated_sh = deepcopy(self.shipments)
-
+        mutated_sh = deepcopy(self.current_shipments)
+        mutated = False
         for i in range(10):
             if random() >= 0.5:
                 sh1, sh2 = choices(mutated_sh, k=2)
                 if swap_drones(sh1, sh2):
-                    score = self.evaluate_shipments(mutated_sh)[0]
-                    return score, mutated_sh
+                    mutated = True
+                    break
             else:
                 sh = choices(mutated_sh)[0]
-                d = choices(self.drones)[0]
+                d = choices(self.chromossome.drones)[0]
                 if change_sh_drone(sh, d):
-                    score = self.evaluate_shipments(mutated_sh)[0]
-                    return score, mutated_sh
+                    mutated = True
+                    break
+
+        if mutated:
+            return self.evaluate_shipments(mutated_sh)[0], mutated_sh
 
         return self.current, mutated_sh
