@@ -16,7 +16,7 @@ class SASimulation(Simulation):
         T0 = 100
 
         self.current = self.evaluate()[0]
-        self.current_shipments = deepcopy(self.chromossome.shipments)
+        self.current_shipments = deepcopy(self.chromosome.shipments)
         best = self.current
         print(f"Initial: {best}")
 
@@ -33,7 +33,7 @@ class SASimulation(Simulation):
                 self.current = new_score
             if (new_score > best):
                 best = new_score
-                self.chromossome.shipments = new_shipments
+                self.chromosome.shipments = new_shipments
 
 
     def cooldown(self, T0, t):
@@ -65,7 +65,7 @@ class SASimulation(Simulation):
                     break
             else:
                 sh = choices(mutated_sh)[0]
-                d = choices(self.chromossome.drones)[0]
+                d = choices(self.chromosome.drones)[0]
                 if change_sh_drone(sh, d):
                     mutated = True
                     break

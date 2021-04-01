@@ -1,7 +1,7 @@
 from copy import deepcopy
 from time import time
 from typing import List
-from Delivery.Chromossome import Chromossome
+from Delivery.Chromosome import Chromosome
 
 from Delivery.Command import Command
 from Delivery.Drone import Drone
@@ -19,7 +19,7 @@ class Simulation:
         self.num_drones = len(drones)
         self.max_cargo = drones[0].max_capacity
         self.products = products
-        self.chromossome : Chromossome = Chromossome(drones, orders, warehouses)
+        self.chromosome : Chromosome = Chromosome(drones, orders, warehouses)
         self.i_drones: List[Drone] = drones
         self.i_orders: List[Order] = orders
         self.i_warehouses: List[Warehouse] = warehouses
@@ -44,14 +44,14 @@ class Simulation:
         print(f"Number of turns: {max_turn}")
         print(f"Average score: {average}")
 
-        self.chromossome.write_to_file(out_file)
+        self.chromosome.write_to_file(out_file)
 
     def evaluate(self):
-        self.chromossome.getCommands()
-        return evaluate(self, self.chromossome.commands)
+        self.chromosome.getCommands()
+        return evaluate(self, self.chromosome.commands)
 
     def evaluate_shipments(self, shipments):
-        return evaluate(self, self.chromossome.getCommandsFromShipments(shipments))
+        return evaluate(self, self.chromosome.getCommandsFromShipments(shipments))
     
     def execute_commands(self, commands: List[str]):
         current_sh = []
@@ -59,12 +59,12 @@ class Simulation:
             if cmd[1] == 'L' and len(current_sh) != 0 and current_sh[-1].type == 'D':
                 shipment = Shipment.fromcommands(current_sh)
                 shipment.execute()
-                self.chromossome.shipments.append(shipment)
+                self.chromosome.shipments.append(shipment)
                 current_sh.clear()
             if cmd[1] == 'L':
-                current_sh.append(Command('L', self.chromossome.drones[int(cmd[0])], self.chromossome.warehouses[int(cmd[2])], self.products[int(cmd[3])], int(cmd[4])))
+                current_sh.append(Command('L', self.chromosome.drones[int(cmd[0])], self.chromosome.warehouses[int(cmd[2])], self.products[int(cmd[3])], int(cmd[4])))
             elif cmd[1] == 'D':
-                current_sh.append(Command('D', self.chromossome.drones[int(cmd[0])], self.chromossome.orders[int(cmd[2])], self.products[int(cmd[3])], int(cmd[4])))
+                current_sh.append(Command('D', self.chromosome.drones[int(cmd[0])], self.chromosome.orders[int(cmd[2])], self.products[int(cmd[3])], int(cmd[4])))
         shipment = Shipment.fromcommands(current_sh)
         shipment.execute()
-        self.chromossome.shipments.append(shipment)
+        self.chromosome.shipments.append(shipment)

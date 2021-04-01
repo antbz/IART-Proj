@@ -9,7 +9,7 @@ from Delivery.Warehouse import Warehouse
 from Evaluate import evaluate
 
 
-class Chromossome:
+class Chromosome:
     def __init__(self, drones, orders, warehouses):
         self.drones: List[Drone] = deepcopy(drones)
         self.orders: List[Order] = deepcopy(orders)
