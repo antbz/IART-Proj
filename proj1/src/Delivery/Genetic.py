@@ -92,19 +92,27 @@ class GeneticSimulation(Simulation):
         c1: Chromosome = deepcopy(couple[0])
         c2: Chromosome = deepcopy(couple[1])
 
-        # Two point crossover
-        # Select start and end points from chromosome
-        start = randrange(len(c1.shipments))
-        end = randrange(start, len(c1.shipments))
-        # Extract slice from parents
+        c1_sh_num = len(c1.shipments)
+        c2_sh_num = len(c2.shipments)
 
-        seq_1 = c1.shipments[start:end + 1]
-        seq_2 = c2.shipments[start:end + 1]
+        # Two point crossover
+        # Select segment size
+        seg_size = randrange(ceil(min([c1_sh_num, c2_sh_num]) / 4))
+
+        # Select start and end points for crossover
+        c1_start = randrange(c1_sh_num - seg_size)
+        c1_end = c1_start + seg_size + 1
+        c2_start = randrange(c2_sh_num - seg_size)
+        c2_end = c2_start + seg_size + 1
+
+        # Extract slice from parents
+        seg_1 = c1.shipments[c1_start:c1_end]
+        seg_2 = c2.shipments[c2_start:c2_end]
 
         # Recombination - insert other parent's slice into
         # child. Also makes sure objects are consistent
-        self.recombine(c1, seq_2, start, end)
-        self.recombine(c2, seq_1, start, end)
+        self.recombine(c1, seg_2, c1_start, c1_end)
+        self.recombine(c2, seg_1, c1_start, c2_end)
 
         # Calculate score for each child and mark
         # constraint violations as inactive
@@ -117,7 +125,7 @@ class GeneticSimulation(Simulation):
             sh.drone = chromosome.drones[sh.drone.id]
             sh.order = chromosome.orders[sh.order.id]
             sh.warehouse = chromosome.warehouses[sh.warehouse.id]
-        chromosome.shipments[start:end + 1] = slice
+        chromosome.shipments[start:end] = slice
 
         if 0.2 >= random():
             self.mutate(chromosome)
