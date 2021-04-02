@@ -118,7 +118,7 @@ def run_eval():
 
     print(f"\nTotal score: {score}")
     print(f"Number of turns: {max_turn}")
-    print(f"Average score: {average}")
+    print(f"Average orders' score: {average}")
     return True
 
 
@@ -141,7 +141,7 @@ def alg_menu():
             elif option_alg == "3":
                 print("\n===Recursive Simulated Annealing===")
             elif option_alg == "4":
-                print("\n===Recursive Simulated Annealing===")
+                print("\n===Genetic===")
             else:
                 print("Invalid option. Try again!")
                 continue
@@ -152,7 +152,7 @@ def alg_menu():
                 break
 
 
-if __name__ == "__main__":
+def main_menu():
     while True:
         print("\nWelcome to the delivery problem!")
         print("Choose the mode:")
@@ -173,3 +173,7 @@ if __name__ == "__main__":
                 leave()
             else:
                 print("Invalid option. Try again!")
+
+
+if __name__ == "__main__":
+    main_menu()

@@ -1,14 +1,20 @@
+import concurrent.futures as cf
 from copy import deepcopy
 from math import ceil
-from os import replace
+from random import choice, randrange, sample, random
 from typing import List
-from random import choice, randrange, sample
+
+import numpy.random as npr
+
 from Delivery.Chromosome import Chromosome
 from Delivery.Drone import Drone
+from Delivery.Mutations import swap_drones, change_sh_drone
 from Delivery.Shipment import Shipment
 from Delivery.Simulation import Simulation
-import numpy.random as npr
-import concurrent.futures as cf
+
+MAX_ITER = 30
+POPULATION_SIZE = 100
+
 
 class GeneticSimulation(Simulation):
     def __init__(self, max_turns, num_rows, num_cols, products, drones, orders, warehouses):
@@ -17,7 +23,7 @@ class GeneticSimulation(Simulation):
     def generate_population(self):
         print("\nGenerating initial population...")
         with cf.ThreadPoolExecutor() as executor:
-            future_list = [executor.submit(self.generate_chromosome) for i in range(20)]
+            future_list = [executor.submit(self.generate_chromosome) for i in range(POPULATION_SIZE)]
             self.population = [f.result() for f in cf.as_completed(future_list)]
 
     def generate_chromosome(self):
@@ -33,19 +39,27 @@ class GeneticSimulation(Simulation):
                 break
         chromosome.score = self.evaluate_shipments(chromosome.shipments)[0]
         return chromosome
-    
+
     def algorithm(self):
         self.generate_population()
+        print(f"Initial population's average score {sum([c.score for c in self.population]) / POPULATION_SIZE}")
+        print(f"Best chromosome's score: {self.best_chromosome().score}")
 
-        for i in range(10):
-            print(i)
+        for i in range(MAX_ITER):
+            print(f"\nIteration number {i + 1}")
             children = self.generate_offspring()
             new_population = self.population + children
-            self.population = list(npr.choice(new_population, size=len(self.population), p=self.roullete_weights(new_population), replace=False))
-            
-        self.chromosome = self.best_chromosome()
+            self.population = list(
+                npr.choice(new_population, size=POPULATION_SIZE, p=self.roullete_weights(new_population),
+                           replace=False))
 
-    def randomShipment(self, chromosome : Chromosome, drone: Drone):
+            print(f"Current population's average score {sum([c.score for c in self.population]) / POPULATION_SIZE}")
+            print(f"Best chromosome's score: {self.best_chromosome().score}")
+
+        self.chromosome = self.best_chromosome()
+        self.chromosome.prune()
+
+    def randomShipment(self, chromosome: Chromosome, drone: Drone):
         order = choice(chromosome.incomplete_orders)
         wh_sample = sample(chromosome.warehouses, k=len(chromosome.warehouses))
         for wh in wh_sample:
@@ -60,13 +74,14 @@ class GeneticSimulation(Simulation):
         roullete = self.roullete_weights(self.population)
         children = []
         with cf.ThreadPoolExecutor() as executor:
-            couples = [npr.choice(self.population, size=2, p=roullete, replace=False) for c in range(int(len(self.population) / 3))]
+            couples = [npr.choice(self.population, size=2, p=roullete, replace=False) for c in
+                       range(int(len(self.population) / 3))]
             copulators = executor.map(self.crossover, couples)
-            # copulators = [executor.submit(self.crossover(c)) for c in couples]
+
             for c in copulators:
                 children.extend(c)
         return children
-    
+
     def roullete_weights(self, population: List[Chromosome]):
         weights = [p.score for p in population]
         t_weight = sum(weights)
@@ -74,9 +89,9 @@ class GeneticSimulation(Simulation):
 
     def crossover(self, couple):
         # Copy parent chromosomes
-        c1 : Chromosome = deepcopy(couple[0])
-        c2 : Chromosome = deepcopy(couple[1])
-        
+        c1: Chromosome = deepcopy(couple[0])
+        c2: Chromosome = deepcopy(couple[1])
+
         # Two point crossover
         # Select start and end points from chromosome
         start = randrange(len(c1.shipments))
@@ -90,7 +105,7 @@ class GeneticSimulation(Simulation):
         # child. Also makes sure objects are consistent
         self.recombine(c1, seq_2, start, end)
         self.recombine(c2, seq_1, start, end)
-        
+
         # Calculate score for each child and mark
         # constraint violations as inactive
         c1.score = self.evaluate_child(c1)
@@ -103,7 +118,22 @@ class GeneticSimulation(Simulation):
             sh.order = chromosome.orders[sh.order.id]
             sh.warehouse = chromosome.warehouses[sh.warehouse.id]
         chromosome.shipments[start:end + 1] = slice
-    
+
+        if 0.2 >= random():
+            self.mutate(chromosome)
+
+    def mutate(self, chromosome: Chromosome):
+        if len(chromosome.shipments) == 1:
+            raise ValueError("Cannot use permutation on single shipments")
+
+        if random() >= 0.5:
+            sh1, sh2 = sample(chromosome.shipments, k=2)
+            swap_drones(sh1, sh2, False)
+        else:
+            sh = choice(chromosome.shipments)
+            d = choice(chromosome.drones)
+            change_sh_drone(sh, d, False)
+
     def evaluate_child(self, child: Chromosome):
         score = 0
         for sh in child.shipments:
@@ -114,6 +144,4 @@ class GeneticSimulation(Simulation):
         return score
 
     def best_chromosome(self):
-        best = max(self.population, key=lambda p: p.score)
-        best.prune()
-        return best
+        return max(self.population, key=lambda c: c.score)
