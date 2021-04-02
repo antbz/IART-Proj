@@ -15,6 +15,7 @@ class GeneticSimulation(Simulation):
         super().__init__(max_turns, num_rows, num_cols, products, drones, orders, warehouses)
 
     def generate_population(self):
+        print("Generating initial population...")
         with cf.ThreadPoolExecutor() as executor:
             future_list = [executor.submit(self.generate_chromosome) for i in range(20)]
             self.population = [f.result() for f in cf.as_completed(future_list)]
@@ -42,7 +43,7 @@ class GeneticSimulation(Simulation):
             new_population = self.population + children
             self.population = list(npr.choice(new_population, size=len(self.population), p=self.roullete_weights(new_population), replace=False))
             
-        self.chromosome = self.best_chromossome()
+        self.chromosome = self.best_chromosome()
 
     def randomShipment(self, chromosome : Chromosome, drone: Drone):
         order = choice(chromosome.incomplete_orders)
@@ -72,17 +73,19 @@ class GeneticSimulation(Simulation):
         return [w / t_weight for w in weights]
 
     def crossover(self, couple):
-        # Copy parent chromossomes
+        # Copy parent chromosomes
         c1 : Chromosome = deepcopy(couple[0])
         c2 : Chromosome = deepcopy(couple[1])
         
         # Two point crossover
-        # Select start and end points from chromossome
+        # Select start and end points from chromosome
         start = randrange(len(c1.shipments))
         end = randrange(start, len(c1.shipments))
         # Extract slice from parents
+
         seq_1 = c1.shipments[start:end + 1]
         seq_2 = c2.shipments[start:end + 1]
+
         # Recombination - insert other parent's slice into
         # child. Also makes sure objects are consistent
         self.recombine(c1, seq_2, start, end)
@@ -94,12 +97,12 @@ class GeneticSimulation(Simulation):
         c2.score = self.evaluate_child(c2)
         return c1, c2
 
-    def recombine(self, chromossome: Chromosome, slice: List[Shipment], start: int, end: int):
+    def recombine(self, chromosome: Chromosome, slice: List[Shipment], start: int, end: int):
         for sh in slice:
-            sh.drone = chromossome.drones[sh.drone.id]
-            sh.order = chromossome.orders[sh.order.id]
-            sh.warehouse = chromossome.warehouses[sh.warehouse.id]
-        chromossome.shipments[start:end+1] = slice
+            sh.drone = chromosome.drones[sh.drone.id]
+            sh.order = chromosome.orders[sh.order.id]
+            sh.warehouse = chromosome.warehouses[sh.warehouse.id]
+        chromosome.shipments[start:end + 1] = slice
     
     def evaluate_child(self, child: Chromosome):
         score = 0
@@ -110,7 +113,7 @@ class GeneticSimulation(Simulation):
                 score += ceil((self.max_turns - sh.drone.turn) / self.max_turns)
         return score
 
-    def best_chromossome(self):
+    def best_chromosome(self):
         best = max(self.population, key=lambda p: p.score)
         best.prune()
         return best
