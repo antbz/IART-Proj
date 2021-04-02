@@ -3,6 +3,7 @@ from pathlib import Path
 
 from Delivery.Genetic import GeneticSimulation
 from Delivery.Greedy import GreedySimulation
+from Delivery.HillClimbing import HillClimbing
 from Delivery.SimAnnealing import SASimulation
 from Evaluate import fileToCommands
 from file import *
@@ -79,16 +80,19 @@ def run_solve(option):
         simulation.__class__ = GreedySimulation
         simulation.solve("../output/" + out_file)
 
-    # SA or RecursiveSA
-    elif option == 2 or option == 3:
+    # HC, SA or RecursiveSA
+    elif option in [2, 3, 4]:
         init_sol_file = init_sol_menu()
         if init_sol_file == "*":
             return False
 
-        simulation.__class__ = SASimulation
+        if option == 2:
+            simulation.__class__ = HillClimbing
+        else:
+            simulation.__class__ = SASimulation
 
         n = 1
-        if option == 3:
+        if option == 4:
             n = number("Enter the number of iterations (0 to cancel): ")
             if n == 0:
                 return False
@@ -97,7 +101,7 @@ def run_solve(option):
         simulation.solve("../output/" + out_file, n)
 
     # Genetic
-    elif option == 4:
+    elif option == 5:
         simulation.__class__ = GeneticSimulation
         simulation.solve("../output/" + out_file)
 
@@ -126,9 +130,10 @@ def alg_menu():
     while True:
         print("\nChoose the algorithm:")
         print("[1] Greedy")
-        print("[2] Simulated Annealing")
-        print("[3] Recursive Simulated Annealing")
-        print("[4] Genetic")
+        print("[2] Hill Climbing (random)")
+        print("[3] Simulated Annealing")
+        print("[4] Recursive Simulated Annealing")
+        print("[5] Genetic")
         print("[0] Back")
         while True:
             option_alg = input("\nEnter your option: ")
@@ -137,10 +142,12 @@ def alg_menu():
             elif option_alg == "1":
                 print("\n===Greedy===")
             elif option_alg == "2":
-                print("\n===Simulated Annealing===")
+                print("\n===Hill Climbing===")
             elif option_alg == "3":
-                print("\n===Recursive Simulated Annealing===")
+                print("\n===Simulated Annealing===")
             elif option_alg == "4":
+                print("\n===Recursive Simulated Annealing===")
+            elif option_alg == "5":
                 print("\n===Genetic===")
             else:
                 print("Invalid option. Try again!")
