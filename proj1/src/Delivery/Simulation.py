@@ -34,9 +34,12 @@ class Simulation:
                f"orders: {self.orders}\n" \
                f"warehouses: {self.warehouses}\n"
 
-    def solve(self, out_file: str):
+    def solve(self, out_file: str, num_itr: int = 1):
         start = time()
-        self.algorithm()
+
+        for n in range(num_itr):
+            self.algorithm()
+
         print(f"\nSolving took: {time() - start}")
 
         score, max_turn, average = self.evaluate()

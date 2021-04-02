@@ -1,9 +1,9 @@
 import sys
 from pathlib import Path
 
+from Delivery.Genetic import GeneticSimulation
 from Delivery.Greedy import GreedySimulation
 from Delivery.SimAnnealing import SASimulation
-from Delivery.Genetic import GeneticSimulation
 from Evaluate import fileToCommands
 from file import *
 
@@ -15,6 +15,13 @@ def leave():
 
 def press():
     input("\nPress Enter to continue...")
+
+
+def number(text: str):
+    n = input(text)
+    while not n.isdigit():
+        n = input("Not a number, try again: ")
+    return int(n)
 
 
 def in_menu():
@@ -67,18 +74,33 @@ def run_solve(option):
 
     simulation = parseInput("../input/" + input_file)
 
+    # Greedy
     if option == 1:
         simulation.__class__ = GreedySimulation
-    elif option == 2:
+        simulation.solve("../output/" + out_file)
+
+    # SA or RecursiveSA
+    elif option == 2 or option == 3:
         init_sol_file = init_sol_menu()
         if init_sol_file == "*":
             return False
-        simulation.__class__ = SASimulation
-        simulation.execute_commands(fileToCommands("../output/" + init_sol_file))
-    elif option == 3:
-        simulation.__class__ = GeneticSimulation
 
-    simulation.solve("../output/" + out_file)
+        simulation.__class__ = SASimulation
+
+        n = 1
+        if option == 3:
+            n = number("Enter the number of iterations (0 to cancel): ")
+            if n == 0:
+                return False
+
+        simulation.execute_commands(fileToCommands("../output/" + init_sol_file))
+        simulation.solve("../output/" + out_file, n)
+
+    # Genetic
+    elif option == 4:
+        simulation.__class__ = GeneticSimulation
+        simulation.solve("../output/" + out_file)
+
     return True
 
 
@@ -105,32 +127,29 @@ def alg_menu():
         print("\nChoose the algorithm:")
         print("[1] Greedy")
         print("[2] Simulated Annealing")
-        print("[3] Genetic")
+        print("[3] Recursive Simulated Annealing")
+        print("[4] Genetic")
         print("[0] Back")
         while True:
             option_alg = input("\nEnter your option: ")
-            if option_alg == "1":
-                print("\nGreedy")
-                if run_solve(1):
-                    return True
-                else:
-                    break
-            elif option_alg == "2":
-                print("\nSimulated Annealing")
-                if run_solve(2):
-                    return True
-                else:
-                    break
-            elif option_alg == "3":
-                print("\nGenetic")
-                if run_solve(3):
-                    return True
-                else:
-                    break
-            elif option_alg == "0":
+            if option_alg == "0":
                 return False
+            elif option_alg == "1":
+                print("\n===Greedy===")
+            elif option_alg == "2":
+                print("\n===Simulated Annealing===")
+            elif option_alg == "3":
+                print("\n===Recursive Simulated Annealing===")
+            elif option_alg == "4":
+                print("\n===Recursive Simulated Annealing===")
             else:
                 print("Invalid option. Try again!")
+                continue
+
+            if run_solve(int(option_alg)):
+                return True
+            else:
+                break
 
 
 if __name__ == "__main__":

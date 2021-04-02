@@ -18,7 +18,7 @@ class SASimulation(Simulation):
         self.current = self.evaluate()[0]
         self.current_shipments = deepcopy(self.chromosome.shipments)
         best = self.current
-        print(f"Initial: {best}")
+        print(f"\nInitial score: {best}")
 
         for t in range(MAX_ITER):
             T = self.cooldown(T0, t)

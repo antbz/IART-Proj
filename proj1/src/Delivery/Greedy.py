@@ -10,6 +10,7 @@ class GreedySimulation(Simulation):
         super().__init__(max_turns, num_rows, num_cols, products, drones, orders, warehouses)
 
     def algorithm(self):
+        print("\nGenerating solution...")
         while not self.chromosome.all_orders_complete():
             attr_count = 0
             for drone in self.chromosome.drones:

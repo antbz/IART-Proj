@@ -15,7 +15,7 @@ class GeneticSimulation(Simulation):
         super().__init__(max_turns, num_rows, num_cols, products, drones, orders, warehouses)
 
     def generate_population(self):
-        print("Generating initial population...")
+        print("\nGenerating initial population...")
         with cf.ThreadPoolExecutor() as executor:
             future_list = [executor.submit(self.generate_chromosome) for i in range(20)]
             self.population = [f.result() for f in cf.as_completed(future_list)]
