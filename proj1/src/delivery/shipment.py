@@ -1,13 +1,12 @@
 from collections import defaultdict
 from typing import Dict, List, Tuple
 
+from delivery.command import Command
+from delivery.drone import Drone
+from delivery.order import Order
+from delivery.product import Product
+from delivery.warehouse import Warehouse
 from ortools.algorithms import pywrapknapsack_solver
-
-from Delivery.Command import Command
-from Delivery.Drone import Drone
-from Delivery.Order import Order
-from Delivery.Product import Product
-from Delivery.Warehouse import Warehouse
 
 
 class Shipment:
@@ -129,8 +128,8 @@ class Shipment:
         return len(self.products) > 0
 
     def execute(self):
-        if not (self.warehouse.has_all_products(self.products) and 
-                self.order.has_all_products(self.products) and 
+        if not (self.warehouse.has_all_products(self.products) and
+                self.order.has_all_products(self.products) and
                 self.drone.turn + self.turns <= self.drone.max_turns):
             return False
         self.warehouse.remove_products(self.products)

@@ -1,6 +1,6 @@
-from Delivery.Drone import Drone
-from Delivery.Product import Product
-from Delivery.ProductContainer import ProductContainer
+from delivery.drone import Drone
+from delivery.product import Product
+from delivery.product_container import ProductContainer
 
 
 class Command:

@@ -1,14 +1,13 @@
-from copy import deepcopy
 from time import time
 from typing import List
-from Delivery.Chromosome import Chromosome
 
-from Delivery.Command import Command
-from Delivery.Drone import Drone
-from Delivery.Order import Order
-from Delivery.Shipment import Shipment
-from Delivery.Warehouse import Warehouse
-from Evaluate import evaluate
+from evaluate import evaluate
+from delivery.chromosome import Chromosome
+from delivery.command import Command
+from delivery.drone import Drone
+from delivery.order import Order
+from delivery.shipment import Shipment
+from delivery.warehouse import Warehouse
 
 
 class Simulation:
@@ -19,7 +18,7 @@ class Simulation:
         self.num_drones = len(drones)
         self.max_cargo = drones[0].max_capacity
         self.products = products
-        self.chromosome : Chromosome = Chromosome(drones, orders, warehouses)
+        self.chromosome: Chromosome = Chromosome(drones, orders, warehouses)
         self.i_drones: List[Drone] = drones
         self.i_orders: List[Order] = orders
         self.i_warehouses: List[Warehouse] = warehouses
@@ -45,7 +44,7 @@ class Simulation:
         score, max_turn, average = self.evaluate()
         print(f"Total score: {score}")
         print(f"Number of turns: {max_turn}")
-        print(f"Average score: {average}")
+        print(f"Average order's score: {average}")
 
         self.chromosome.write_to_file(out_file)
 
@@ -55,7 +54,7 @@ class Simulation:
 
     def evaluate_shipments(self, shipments):
         return evaluate(self, self.chromosome.getCommandsFromShipments(shipments))
-    
+
     def execute_commands(self, commands: List[str]):
         current_sh = []
         for cmd in [c.split() for c in commands]:

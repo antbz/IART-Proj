@@ -1,7 +1,7 @@
 class Obj:
     def __init__(self, id):
-        self.id : int = id
-    
+        self.id: int = id
+
     def __hash__(self):
         return hash(self.id)
 

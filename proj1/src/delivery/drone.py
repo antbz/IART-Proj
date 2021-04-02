@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from Delivery.ProductContainer import ProductContainer
+from delivery.product_container import ProductContainer
 
 
 class Drone(ProductContainer):

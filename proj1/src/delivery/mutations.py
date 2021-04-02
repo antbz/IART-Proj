@@ -1,5 +1,5 @@
-from Delivery.Drone import Drone
-from Delivery.Shipment import Shipment
+from delivery.drone import Drone
+from delivery.shipment import Shipment
 
 
 def swap_drones(sh1: Shipment, sh2: Shipment, condition: bool):

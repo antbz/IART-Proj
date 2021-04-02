@@ -1,12 +1,10 @@
 from copy import deepcopy
 from typing import List
-from Delivery.Command import Command
 
-from Delivery.Drone import Drone
-from Delivery.Order import Order
-from Delivery.Shipment import Shipment
-from Delivery.Warehouse import Warehouse
-from Evaluate import evaluate
+from delivery.drone import Drone
+from delivery.order import Order
+from delivery.shipment import Shipment
+from delivery.warehouse import Warehouse
 
 
 class Chromosome:
@@ -16,16 +14,16 @@ class Chromosome:
         self.warehouses: List[Warehouse] = deepcopy(warehouses)
         self.shipments: List[Shipment] = []
         self.score = 0
-    
+
     def all_orders_complete(self):
         self.incomplete_orders = [o for o in self.orders if not o.is_complete()]
         return len(self.incomplete_orders) == 0
-    
+
     def write_to_file(self, out_file):
         with open(out_file, mode='wt') as out:
             out.write(str(len(self.commands)))
             out.writelines(self.commands)
-    
+
     def getCommands(self):
         self.commands = self.getCommandsFromShipments(self.shipments)
         return self.commands
@@ -38,4 +36,3 @@ class Chromosome:
 
     def prune(self):
         self.shipments = [sh for sh in self.shipments if sh.is_active]
-    

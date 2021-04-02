@@ -6,11 +6,11 @@ from typing import List
 
 import numpy.random as npr
 
-from Delivery.Chromosome import Chromosome
-from Delivery.Drone import Drone
-from Delivery.Mutations import swap_drones, change_sh_drone
-from Delivery.Shipment import Shipment
-from Delivery.Simulation import Simulation
+from delivery.chromosome import Chromosome
+from delivery.drone import Drone
+from delivery.mutations import swap_drones, change_sh_drone
+from delivery.shipment import Shipment
+from delivery.simulation import Simulation
 
 MAX_ITER = 30
 POPULATION_SIZE = 100

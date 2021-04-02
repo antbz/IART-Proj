@@ -1,7 +1,7 @@
 from typing import Dict, Tuple
 
-from Delivery.Positionable import Positionable
-from Delivery.Product import Product
+from delivery.positionable import Positionable
+from delivery.product import Product
 
 
 class ProductContainer(Positionable):
@@ -32,7 +32,7 @@ class ProductContainer(Positionable):
 
     def remove_all_products(self):
         self._products = {}
-    
+
     def has_all_products(self, products: Dict[Product, int]):
         for product, quantity in products.items():
             own = self._products.get(product)

@@ -1,11 +1,11 @@
 import sys
 from pathlib import Path
 
-from Delivery.Genetic import GeneticSimulation
-from Delivery.Greedy import GreedySimulation
-from Delivery.HillClimbing import HillClimbing
-from Delivery.SimAnnealing import SASimulation
-from Evaluate import fileToCommands
+from delivery.genetic import GeneticSimulation
+from delivery.greedy import GreedySimulation
+from delivery.hill_climbing import HillClimbing
+from delivery.sim_annealing import SASimulation
+from evaluate import fileToCommands
 from file import *
 
 

@@ -1,4 +1,4 @@
-from Delivery.Obj import Obj
+from delivery.obj import Obj
 
 
 class Product(Obj):

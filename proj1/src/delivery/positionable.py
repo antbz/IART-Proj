@@ -1,7 +1,7 @@
 from math import ceil, dist
 from typing import List, Tuple
 
-from Delivery.Obj import Obj
+from delivery.obj import Obj
 
 
 class Positionable(Obj):

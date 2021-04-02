@@ -1,8 +1,8 @@
 from typing import List
 
-from Delivery.Drone import Drone
-from Delivery.Shipment import Shipment
-from Delivery.Simulation import Simulation
+from delivery.drone import Drone
+from delivery.shipment import Shipment
+from delivery.simulation import Simulation
 
 
 class GreedySimulation(Simulation):

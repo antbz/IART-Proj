@@ -2,10 +2,10 @@ from copy import deepcopy
 from typing import DefaultDict, Dict
 from math import ceil
 
-from Delivery.Product import *
-from Delivery.Warehouse import *
-from Delivery.Drone import *
-from Delivery.Order import *
+from delivery.product import *
+from delivery.warehouse import *
+from delivery.drone import *
+from delivery.order import *
 
 
 def evaluate(simulation, commands):

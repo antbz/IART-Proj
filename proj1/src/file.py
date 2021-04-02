@@ -1,8 +1,8 @@
 from collections import Counter
 
-from Delivery.Product import *
-from Delivery.Simulation import *
-from Delivery.Warehouse import *
+from delivery.product import *
+from delivery.simulation import *
+from delivery.warehouse import *
 
 
 def parseInput(path):
