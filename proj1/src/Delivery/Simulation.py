@@ -37,7 +37,7 @@ class Simulation:
     def solve(self, out_file: str):
         start = time()
         self.algorithm()
-        print(f"Solving took: {time() - start}")
+        print(f"\nSolving took: {time() - start}")
 
         score, max_turn, average = self.evaluate()
         print(f"Total score: {score}")

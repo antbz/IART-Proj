@@ -3,7 +3,6 @@ from collections import Counter
 from Delivery.Product import *
 from Delivery.Simulation import *
 from Delivery.Warehouse import *
-from pathlib import Path
 
 
 def parseInput(path):
