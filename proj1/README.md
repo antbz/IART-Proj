@@ -14,7 +14,7 @@ To run the program, run the command ``python main.py`` on the terminal inside th
 
 ### How to use
 
-When the program starts, on the terminal is displayed the following menu:
+When the program starts, the following menu is displayed on the terminal:
 
 ![Main Menu](./docs/img/main_menu.png)
 
@@ -32,7 +32,7 @@ When choosing the **Solve** option, the user is presented with the menu below, w
 
 Figure 2: Algorithm Menu
 
-In both Evaluate and Solve options the user must give the input file name, within the input folder, and the output file name, within the output folder. In the case the algorithm chosen is Simulated Annealing, the user must also give the file name of the initial solution, within the output folder.
+In both Evaluate and Solve options the user must give the input file name, within the input folder, and the output file name, within the output folder. If Simulated Annealing is the chosen algorithm, the user must also give the file name of the initial solution, within the output folder.
 The following image is an example of the files chosen for running the Simulated Algorithm:
 
 ![Example](./docs/img/sa_example.png)
