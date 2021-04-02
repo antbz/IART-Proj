@@ -1,13 +1,13 @@
 from time import time
 from typing import List
 
-from evaluate import evaluate
 from delivery.chromosome import Chromosome
 from delivery.command import Command
 from delivery.drone import Drone
 from delivery.order import Order
 from delivery.shipment import Shipment
 from delivery.warehouse import Warehouse
+from evaluate import evaluate
 
 
 class Simulation:
@@ -23,15 +23,15 @@ class Simulation:
         self.i_orders: List[Order] = orders
         self.i_warehouses: List[Warehouse] = warehouses
 
-    def __str__(self):
+    def __repr__(self):
         return f"Simulation\n" \
                f"max turns: {self.max_turns}\n" \
                f"num rows: {self.num_rows}\n" \
                f"num cols: {self.num_cols}\n" \
                f"products: {self.products}\n" \
-               f"drones: {self.drones}\n" \
-               f"orders: {self.orders}\n" \
-               f"warehouses: {self.warehouses}\n"
+               f"drones: {self.i_drones}\n" \
+               f"orders: {self.i_orders}\n" \
+               f"warehouses: {self.i_warehouses}\n"
 
     def solve(self, out_file: str, num_itr: int = 1):
         start = time()
