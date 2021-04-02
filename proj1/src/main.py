@@ -4,6 +4,7 @@ from pathlib import Path
 from delivery.genetic import GeneticSimulation
 from delivery.greedy import GreedySimulation
 from delivery.hill_climbing import HillClimbing
+from delivery.randoms import RandomSimulation
 from delivery.sim_annealing import SASimulation
 from evaluate import fileToCommands
 from file import *
@@ -75,24 +76,29 @@ def run_solve(option):
 
     simulation = parseInput("../input/" + input_file)
 
-    # Greedy
+    # Random
     if option == 1:
+        simulation.__class__ = RandomSimulation
+        simulation.solve("../output/" + out_file)
+
+    # Greedy
+    if option == 2:
         simulation.__class__ = GreedySimulation
         simulation.solve("../output/" + out_file)
 
     # HC, SA or RecursiveSA
-    elif option in [2, 3, 4]:
+    elif option in [3, 4, 5]:
         init_sol_file = init_sol_menu()
         if init_sol_file == "*":
             return False
 
-        if option == 2:
+        if option == 3:
             simulation.__class__ = HillClimbing
         else:
             simulation.__class__ = SASimulation
 
         n = 1
-        if option == 4:
+        if option == 5:
             n = number("Enter the number of iterations (0 to cancel): ")
             if n == 0:
                 return False
@@ -101,7 +107,7 @@ def run_solve(option):
         simulation.solve("../output/" + out_file, n)
 
     # Genetic
-    elif option == 5:
+    elif option == 6:
         simulation.__class__ = GeneticSimulation
         simulation.solve("../output/" + out_file)
 
@@ -129,25 +135,28 @@ def run_eval():
 def alg_menu():
     while True:
         print("\nChoose the algorithm:")
-        print("[1] Greedy")
-        print("[2] Hill Climbing (random)")
-        print("[3] Simulated Annealing")
-        print("[4] Recursive Simulated Annealing")
-        print("[5] Genetic")
+        print("[1] Random")
+        print("[2] Greedy")
+        print("[3] Hill Climbing (random)")
+        print("[4] Simulated Annealing")
+        print("[5] Recursive Simulated Annealing")
+        print("[6] Genetic")
         print("[0] Back")
         while True:
             option_alg = input("\nEnter your option: ")
             if option_alg == "0":
                 return False
             elif option_alg == "1":
-                print("\n===Greedy===")
+                print("\n===Random===")
             elif option_alg == "2":
-                print("\n===Hill Climbing===")
+                print("\n===Greedy===")
             elif option_alg == "3":
-                print("\n===Simulated Annealing===")
+                print("\n===Hill Climbing===")
             elif option_alg == "4":
-                print("\n===Recursive Simulated Annealing===")
+                print("\n===Simulated Annealing===")
             elif option_alg == "5":
+                print("\n===Recursive Simulated Annealing===")
+            elif option_alg == "6":
                 print("\n===Genetic===")
             else:
                 print("Invalid option. Try again!")
