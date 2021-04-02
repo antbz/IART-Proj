@@ -1,6 +1,6 @@
 from copy import deepcopy
 from math import exp, log
-from random import random, choices
+from random import choice, random, sample
 
 from Delivery.Mutations import swap_drones, change_sh_drone
 from Delivery.Simulation import Simulation
@@ -59,13 +59,13 @@ class SASimulation(Simulation):
         mutated = False
         for i in range(10):
             if random() >= 0.5:
-                sh1, sh2 = choices(mutated_sh, k=2)
+                sh1, sh2 = sample(mutated_sh, k=2)
                 if swap_drones(sh1, sh2):
                     mutated = True
                     break
             else:
-                sh = choices(mutated_sh)[0]
-                d = choices(self.chromosome.drones)[0]
+                sh = choice(mutated_sh)
+                d = choice(self.chromosome.drones)
                 if change_sh_drone(sh, d):
                     mutated = True
                     break

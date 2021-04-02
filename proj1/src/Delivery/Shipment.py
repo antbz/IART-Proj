@@ -20,6 +20,7 @@ class Shipment:
         self.turns = turns
         self.score = score
         self.percent = percent
+        self.is_active: bool = True
 
     def __repr__(self):
         return f"Shipment(drone: {self.drone.id}; warehouse: {self.warehouse.id}; order: {self.order.id}; products: {self.products})"
@@ -116,16 +117,24 @@ class Shipment:
     def calculateScore(self):
         self.product_weight = sum(p.weight * q for p, q in self.products.items())
         self.percent = self.product_weight / self.order.product_weight
+        self.calculate_turns()
+        self.score = self.percent / self.turns
+
+    def calculate_turns(self):
         dw = self.drone.distanceTo(self.warehouse)
         do = self.warehouse.distanceTo(self.order)
         self.turns = dw + do + len(self.products) * 2
-        self.score = self.percent / self.turns
 
     def hasProducts(self):
         return len(self.products) > 0
 
     def execute(self):
+        if not (self.warehouse.has_all_products(self.products) and 
+                self.order.has_all_products(self.products) and 
+                self.drone.turn + self.turns <= self.drone.max_turns):
+            return False
         self.warehouse.remove_products(self.products)
         self.order.remove_products(self.products)
         self.drone.set_position(self.order.position)
         self.drone.add_turns(self.turns)
+        return True

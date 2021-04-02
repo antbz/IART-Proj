@@ -32,3 +32,10 @@ class ProductContainer(Positionable):
 
     def remove_all_products(self):
         self._products = {}
+    
+    def has_all_products(self, products: Dict[Product, int]):
+        for product, quantity in products.items():
+            own = self._products.get(product)
+            if own == None or own < quantity:
+                return False
+        return True
