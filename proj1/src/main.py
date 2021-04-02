@@ -111,17 +111,19 @@ def run_solve(option):
         simulation.__class__ = GeneticSimulation
         simulation.solve("../output/" + out_file)
 
+    press()
     return True
 
 
 def run_eval():
+    print("\n===Evaluate===")
     input_file = in_menu()
     if input_file == "*":
-        return False
+        return
 
     out_file = out_menu()
     if out_file == "*":
-        return False
+        return
 
     simulation = parseInput("../input/" + input_file)
     score, max_turn, average = evaluate(simulation, fileToCommands("../output/" + out_file))
@@ -129,7 +131,9 @@ def run_eval():
     print(f"\nTotal score: {score}")
     print(f"Number of turns: {max_turn}")
     print(f"Average orders' score: {average}")
-    return True
+
+    press()
+    return
 
 
 def alg_menu():
@@ -145,7 +149,7 @@ def alg_menu():
         while True:
             option_alg = input("\nEnter your option: ")
             if option_alg == "0":
-                return False
+                return
             elif option_alg == "1":
                 print("\n===Random===")
             elif option_alg == "2":
@@ -163,7 +167,7 @@ def alg_menu():
                 continue
 
             if run_solve(int(option_alg)):
-                return True
+                return
             else:
                 break
 
@@ -178,12 +182,10 @@ def main_menu():
         while True:
             option_main = input("\nEnter your option: ")
             if option_main == "1":
-                if alg_menu():
-                    press()
+                alg_menu()
                 break
             elif option_main == "2":
-                if run_eval():
-                    press()
+                run_eval()
                 break
             elif option_main == "0":
                 leave()
