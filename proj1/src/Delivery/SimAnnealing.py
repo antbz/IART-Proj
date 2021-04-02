@@ -60,13 +60,13 @@ class SASimulation(Simulation):
         for i in range(10):
             if random() >= 0.5:
                 sh1, sh2 = sample(mutated_sh, k=2)
-                if swap_drones(sh1, sh2):
+                if swap_drones(sh1, sh2, True):
                     mutated = True
                     break
             else:
                 sh = choice(mutated_sh)
                 d = choice(self.chromosome.drones)
-                if change_sh_drone(sh, d):
+                if change_sh_drone(sh, d, True):
                     mutated = True
                     break
 
