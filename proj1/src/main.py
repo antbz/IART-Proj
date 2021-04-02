@@ -3,6 +3,7 @@ from pathlib import Path
 
 from Delivery.Greedy import GreedySimulation
 from Delivery.SimAnnealing import SASimulation
+from Delivery.Genetic import GeneticSimulation
 from Evaluate import fileToCommands
 from file import *
 
@@ -56,31 +57,29 @@ def init_sol_menu():
 
 
 def run_solve(option):
-    if option == 3:
-        print("Work in progress")
-        sys.exit()
-    else:
-        input_file = in_menu()
-        if input_file == "*":
+    input_file = in_menu()
+    if input_file == "*":
+        return False
+
+    out_file = out_menu()
+    if out_file == "*":
+        return False
+
+    simulation = parseInput("../input/" + input_file)
+
+    if option == 1:
+        simulation.__class__ = GreedySimulation
+    elif option == 2:
+        init_sol_file = init_sol_menu()
+        if init_sol_file == "*":
             return False
+        simulation.__class__ = SASimulation
+        simulation.execute_commands(fileToCommands("../output/" + init_sol_file))
+    elif option == 3:
+        simulation.__class__ = GeneticSimulation
 
-        out_file = out_menu()
-        if out_file == "*":
-            return False
-
-        simulation = parseInput("../input/" + input_file)
-
-        if option == 1:
-            simulation.__class__ = GreedySimulation
-        elif option == 2:
-            init_sol_file = init_sol_menu()
-            if init_sol_file == "*":
-                return False
-            simulation.__class__ = SASimulation
-            simulation.execute_commands(fileToCommands("../output/" + init_sol_file))
-
-        simulation.solve("../output/" + out_file)
-        return True
+    simulation.solve("../output/" + out_file)
+    return True
 
 
 def run_eval():
