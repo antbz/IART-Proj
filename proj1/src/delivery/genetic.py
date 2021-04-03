@@ -50,10 +50,7 @@ class GeneticSimulation(Simulation):
             print(f"\nIteration number {i + 1}")
             children = self.generate_offspring()
             new_population = self.population + children
-            with cf.ThreadPoolExecutor() as executor:
-                mutated = npr.choice(self.population, size=ceil(len(new_population)/2), replace=False)
-                for m in executor.map(self.mutate, mutated):
-                    continue
+            self.mutate_population(new_population)
             self.population = list(
                 npr.choice(new_population, size=POPULATION_SIZE, p=self.roullete_weights(new_population),
                            replace=False))
@@ -62,9 +59,6 @@ class GeneticSimulation(Simulation):
             print(f"Best chromosome's score: {self.best_chromosome().score}")
 
         self.chromosome = self.best_chromosome()
-        print([sh.is_active for sh in self.chromosome.shipments])
-        print([ord.products for ord in self.chromosome.orders])
-        print(self.chromosome.score)
         self.chromosome.prune()
 
     def randomShipment(self, chromosome: Chromosome, drone: Drone):
@@ -83,11 +77,17 @@ class GeneticSimulation(Simulation):
         children = []
         with cf.ThreadPoolExecutor() as executor:
             couples = [npr.choice(self.population, size=2, p=roullete, replace=False) for c in
-                       range(int(len(self.population) / 10))]
+                       range(int(len(self.population) / 20))]
             copulators = executor.map(self.crossover, couples)
             for c in copulators:
                 children.extend(c)
         return children
+    
+    def mutate_population(self, population: List[Chromosome]):
+        with cf.ThreadPoolExecutor() as executor:
+            mutated = npr.choice(self.population, size=ceil(len(population)/5), replace=False)
+            for m in executor.map(self.mutate, mutated):
+                population.append(m)
 
     def roullete_weights(self, population: List[Chromosome]):
         weights = [p.score for p in population]
@@ -104,7 +104,7 @@ class GeneticSimulation(Simulation):
 
         # Two point crossover
         # Select segment size
-        seg_size = min(randrange(ceil(min([c1_sh_num, c2_sh_num]) / 4)) + 1, 20)
+        seg_size = min(randrange(ceil(min([c1_sh_num, c2_sh_num]) / 5)) + 1, 10)
 
         # Select start and end points for crossover
         c1_start = randrange(c1_sh_num - seg_size + 1)
@@ -136,16 +136,20 @@ class GeneticSimulation(Simulation):
         chromosome.shipments[start:end] = slice
 
     def mutate(self, chromosome: Chromosome):
-        if random() >= 0.5 and len(chromosome.shipments) > 1:
-            sh1, sh2 = sample(chromosome.shipments, k=2)
-            swap_drones(sh1, sh2, False)
-        else:
-            sh = choice(chromosome.shipments)
-            d = choice(chromosome.drones)
-            change_sh_drone(sh, d, False)
+        mutated = deepcopy(chromosome)
+        for i in range(10):
+            if random() >= 0.5 and len(mutated.shipments) > 1:
+                sh1, sh2 = sample(mutated.shipments, k=2)
+                if swap_drones(sh1, sh2, True):
+                    break
+            else:
+                sh = choice(mutated.shipments)
+                d = choice(mutated.drones)
+                if change_sh_drone(sh, d, True):
+                    break
         
-        chromosome.score = self.evaluate_child(chromosome)
-        return chromosome
+        mutated.score = self.evaluate_child(mutated)
+        return mutated
 
     def evaluate_child(self, child: Chromosome):
         for ord in child.orders:
@@ -164,6 +168,8 @@ class GeneticSimulation(Simulation):
             before = sh.order.is_complete()
             sh.calculate_turns()
             sh.is_active = sh.execute()
+            if not sh.is_active:
+                score -= 0
             if not before and sh.is_active and sh.order.is_complete():
                 o_score = ceil(100 * (self.max_turns - max(sh.order.deliveries) + 1) / self.max_turns)
                 score += o_score
