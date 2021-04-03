@@ -29,13 +29,10 @@ class HillClimbing(Simulation):
                 self.chromosome.shipments = new_shipments
 
     def random_neighbor(self):
-        if len(self.current_shipments) == 1:
-            raise ValueError("Cannot use permutation on single shipments")
-
         mutated_sh = deepcopy(self.current_shipments)
         mutated = False
         for i in range(10):
-            if random() >= 0.5:
+            if random() >= 0.5 and len(self.current_shipments) > 1:
                 sh1, sh2 = sample(mutated_sh, k=2)
                 if swap_drones(sh1, sh2, True):
                     mutated = True
