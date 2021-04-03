@@ -1,6 +1,7 @@
 import concurrent.futures as cf
 from copy import deepcopy
 from math import ceil
+from os import replace
 from random import choice, randrange, sample, random
 from typing import List
 
@@ -12,8 +13,8 @@ from delivery.mutations import swap_drones, change_sh_drone
 from delivery.shipment import Shipment
 from delivery.simulation import Simulation
 
-MAX_ITER = 30
-POPULATION_SIZE = 100
+MAX_ITER = 50
+POPULATION_SIZE = 50
 
 
 class GeneticSimulation(Simulation):
@@ -49,6 +50,10 @@ class GeneticSimulation(Simulation):
             print(f"\nIteration number {i + 1}")
             children = self.generate_offspring()
             new_population = self.population + children
+            with cf.ThreadPoolExecutor() as executor:
+                mutated = npr.choice(self.population, size=ceil(len(new_population)/2), replace=False)
+                for m in executor.map(self.mutate, mutated):
+                    continue
             self.population = list(
                 npr.choice(new_population, size=POPULATION_SIZE, p=self.roullete_weights(new_population),
                            replace=False))
@@ -57,6 +62,9 @@ class GeneticSimulation(Simulation):
             print(f"Best chromosome's score: {self.best_chromosome().score}")
 
         self.chromosome = self.best_chromosome()
+        print([sh.is_active for sh in self.chromosome.shipments])
+        print([ord.products for ord in self.chromosome.orders])
+        print(self.chromosome.score)
         self.chromosome.prune()
 
     def randomShipment(self, chromosome: Chromosome, drone: Drone):
@@ -75,9 +83,8 @@ class GeneticSimulation(Simulation):
         children = []
         with cf.ThreadPoolExecutor() as executor:
             couples = [npr.choice(self.population, size=2, p=roullete, replace=False) for c in
-                       range(int(len(self.population) / 3))]
+                       range(int(len(self.population) / 10))]
             copulators = executor.map(self.crossover, couples)
-
             for c in copulators:
                 children.extend(c)
         return children
@@ -97,13 +104,13 @@ class GeneticSimulation(Simulation):
 
         # Two point crossover
         # Select segment size
-        seg_size = randrange(ceil(min([c1_sh_num, c2_sh_num]) / 4))
+        seg_size = min(randrange(ceil(min([c1_sh_num, c2_sh_num]) / 4)) + 1, 20)
 
         # Select start and end points for crossover
-        c1_start = randrange(c1_sh_num - seg_size)
-        c1_end = c1_start + seg_size + 1
-        c2_start = randrange(c2_sh_num - seg_size)
-        c2_end = c2_start + seg_size + 1
+        c1_start = randrange(c1_sh_num - seg_size + 1)
+        c1_end = c1_start + seg_size 
+        c2_start = randrange(c2_sh_num - seg_size + 1)
+        c2_end = c2_start + seg_size 
 
         # Extract slice from parents
         seg_1 = c1.shipments[c1_start:c1_end]
@@ -112,7 +119,7 @@ class GeneticSimulation(Simulation):
         # Recombination - insert other parent's slice into
         # child. Also makes sure objects are consistent
         self.recombine(c1, seg_2, c1_start, c1_end)
-        self.recombine(c2, seg_1, c1_start, c2_end)
+        self.recombine(c2, seg_1, c2_start, c2_end)
 
         # Calculate score for each child and mark
         # constraint violations as inactive
@@ -125,30 +132,41 @@ class GeneticSimulation(Simulation):
             sh.drone = chromosome.drones[sh.drone.id]
             sh.order = chromosome.orders[sh.order.id]
             sh.warehouse = chromosome.warehouses[sh.warehouse.id]
+                
         chromosome.shipments[start:end] = slice
 
-        if 0.2 >= random():
-            self.mutate(chromosome)
-
     def mutate(self, chromosome: Chromosome):
-        if len(chromosome.shipments) == 1:
-            raise ValueError("Cannot use permutation on single shipments")
-
-        if random() >= 0.5:
+        if random() >= 0.5 and len(chromosome.shipments) > 1:
             sh1, sh2 = sample(chromosome.shipments, k=2)
             swap_drones(sh1, sh2, False)
         else:
             sh = choice(chromosome.shipments)
             d = choice(chromosome.drones)
             change_sh_drone(sh, d, False)
+        
+        chromosome.score = self.evaluate_child(chromosome)
+        return chromosome
 
     def evaluate_child(self, child: Chromosome):
+        for ord in child.orders:
+            ord.remove_all_products()
+            ord.add_products(self.i_orders[ord.id].products)
+            ord.clear_deliveries()
+        for wh in child.warehouses:
+            wh.remove_all_products()
+            wh.add_products(self.i_warehouses[wh.id].products)
+        for d in child.drones:
+            d.turn = 0
+            d.set_position(child.warehouses[0].position)
+        
         score = 0
         for sh in child.shipments:
+            before = sh.order.is_complete()
             sh.calculate_turns()
             sh.is_active = sh.execute()
-            if sh.order.is_complete():
-                score += ceil((self.max_turns - sh.drone.turn) / self.max_turns)
+            if not before and sh.is_active and sh.order.is_complete():
+                o_score = ceil(100 * (self.max_turns - max(sh.order.deliveries) + 1) / self.max_turns)
+                score += o_score
         return score
 
     def best_chromosome(self):

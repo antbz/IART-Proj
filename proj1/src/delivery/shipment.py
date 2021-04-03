@@ -22,7 +22,7 @@ class Shipment:
         self.is_active: bool = True
 
     def __repr__(self):
-        return f"Shipment(drone: {self.drone.id}; warehouse: {self.warehouse.id}; order: {self.order.id}; products: {self.products})"
+        return f"Shipment(active: {self.is_active}; drone: {self.drone.id}; warehouse: {self.warehouse.id}; order: {self.order.id}; products: {self.products})"
 
     @classmethod
     def fromcommands(cls, commands: List[Command]):
@@ -136,4 +136,5 @@ class Shipment:
         self.order.remove_products(self.products)
         self.drone.set_position(self.order.position)
         self.drone.add_turns(self.turns)
+        self.order.add_delivery(self.drone)
         return True

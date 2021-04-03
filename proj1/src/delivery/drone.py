@@ -8,7 +8,6 @@ class Drone(ProductContainer):
         super().__init__(id, position)
         self.max_capacity = max_capacity
         self.max_turns = max_turns
-        self.used_capacity = 0
         self.turn = 0
 
     def __repr__(self):
