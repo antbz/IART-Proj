@@ -1,18 +1,17 @@
 from copy import deepcopy
-from typing import DefaultDict, Dict
 from math import ceil
+from typing import DefaultDict, Dict
 
+from delivery.order import *
 from delivery.product import *
 from delivery.warehouse import *
-from delivery.drone import *
-from delivery.order import *
 
 
 def evaluate(simulation, commands):
-    warehouses: Dict[int, Warehouse] = { w.id: w for w in deepcopy(simulation.i_warehouses) }
-    orders: Dict[int, Order] = { o.id: o for o in deepcopy(simulation.i_orders) }
-    drones: Dict[int, Drone] = { d.id : d for d in deepcopy(simulation.i_drones) }
-    products: Dict[int, Product] = { p.id: p for p in simulation.products }
+    warehouses: Dict[int, Warehouse] = {w.id: w for w in deepcopy(simulation.i_warehouses)}
+    orders: Dict[int, Order] = {o.id: o for o in deepcopy(simulation.i_orders)}
+    drones: Dict[int, Drone] = {d.id: d for d in deepcopy(simulation.i_drones)}
+    products: Dict[int, Product] = {p.id: p for p in simulation.products}
     max_cargo = simulation.max_cargo
     max_turns = simulation.max_turns
 
@@ -64,7 +63,7 @@ def evaluate(simulation, commands):
 
             drone_to_delivery_time[drone] += drone.distanceTo(order) + 1
             drone.set_position(order.position)
-            order_to_delivery_time[order].append(drone_to_delivery_time[drone]-1)
+            order_to_delivery_time[order].append(drone_to_delivery_time[drone] - 1)
 
             if order.is_complete():
                 delivery_time = max(order_to_delivery_time[order])

@@ -1,7 +1,6 @@
 import concurrent.futures as cf
 from copy import deepcopy
 from math import ceil
-from os import replace
 from random import choice, randrange, sample, random
 from typing import List
 
@@ -82,10 +81,10 @@ class GeneticSimulation(Simulation):
             for c in copulators:
                 children.extend(c)
         return children
-    
+
     def mutate_population(self, population: List[Chromosome]):
         with cf.ThreadPoolExecutor() as executor:
-            mutated = npr.choice(self.population, size=ceil(len(population)/5), replace=False)
+            mutated = npr.choice(self.population, size=ceil(len(population) / 5), replace=False)
             for m in executor.map(self.mutate, mutated):
                 population.append(m)
 
@@ -108,9 +107,9 @@ class GeneticSimulation(Simulation):
 
         # Select start and end points for crossover
         c1_start = randrange(c1_sh_num - seg_size + 1)
-        c1_end = c1_start + seg_size 
+        c1_end = c1_start + seg_size
         c2_start = randrange(c2_sh_num - seg_size + 1)
-        c2_end = c2_start + seg_size 
+        c2_end = c2_start + seg_size
 
         # Extract slice from parents
         seg_1 = c1.shipments[c1_start:c1_end]
@@ -132,7 +131,7 @@ class GeneticSimulation(Simulation):
             sh.drone = chromosome.drones[sh.drone.id]
             sh.order = chromosome.orders[sh.order.id]
             sh.warehouse = chromosome.warehouses[sh.warehouse.id]
-                
+
         chromosome.shipments[start:end] = slice
 
     def mutate(self, chromosome: Chromosome):
@@ -147,7 +146,7 @@ class GeneticSimulation(Simulation):
                 d = choice(mutated.drones)
                 if change_sh_drone(sh, d, True):
                     break
-        
+
         mutated.score = self.evaluate_child(mutated)
         return mutated
 
@@ -162,7 +161,7 @@ class GeneticSimulation(Simulation):
         for d in child.drones:
             d.turn = 0
             d.set_position(child.warehouses[0].position)
-        
+
         score = 0
         for sh in child.shipments:
             before = sh.order.is_complete()

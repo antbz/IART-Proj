@@ -1,12 +1,13 @@
 from collections import defaultdict
 from typing import Dict, List, Tuple
 
+from ortools.algorithms import pywrapknapsack_solver
+
 from delivery.command import Command
 from delivery.drone import Drone
 from delivery.order import Order
 from delivery.product import Product
 from delivery.warehouse import Warehouse
-from ortools.algorithms import pywrapknapsack_solver
 
 
 class Shipment:

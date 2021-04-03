@@ -1,4 +1,5 @@
 from typing import List
+
 from delivery.drone import Drone
 from delivery.product_container import ProductContainer
 
@@ -17,6 +18,6 @@ class Order(ProductContainer):
 
     def clear_deliveries(self):
         self.deliveries.clear()
-    
+
     def add_delivery(self, drone: Drone):
         self.deliveries.append(drone.turn)
