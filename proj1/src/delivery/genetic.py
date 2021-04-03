@@ -13,8 +13,8 @@ from delivery.mutations import swap_drones, change_sh_drone
 from delivery.shipment import Shipment
 from delivery.simulation import Simulation
 
-MAX_ITER = 50
 POPULATION_SIZE = 50
+MAX_ITER = 30
 
 
 class GeneticSimulation(Simulation):
