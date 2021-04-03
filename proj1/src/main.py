@@ -121,12 +121,12 @@ def run_eval():
     if input_file == "*":
         return
 
-    out_file = out_menu()
-    if out_file == "*":
+    init_sol_file = init_sol_menu()
+    if init_sol_file == "*":
         return
 
     simulation = parseInput("../input/" + input_file)
-    score, max_turn, average, num_orders = evaluate(simulation, fileToCommands("../output/" + out_file))
+    score, max_turn, average, num_orders = evaluate(simulation, fileToCommands("../output/" + init_sol_file))
 
     print(f"\nTotal score: {score}")
     print(f"Number of turns: {max_turn}")
