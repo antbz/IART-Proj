@@ -82,7 +82,7 @@ def run_solve(option):
         simulation.solve("../output/" + out_file)
 
     # Greedy
-    if option == 2:
+    elif option == 2:
         simulation.__class__ = GreedySimulation
         simulation.solve("../output/" + out_file)
 
