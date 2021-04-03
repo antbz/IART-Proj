@@ -77,8 +77,9 @@ def evaluate(simulation, commands):
                     raise ValueError(f"Command {i}: Run out of time.")
         else:
             raise ValueError(f"Command {i}: Unknown command {str_command}.")
-    
-    return score, deliv_max, score / len(orders)
+
+    num_orders = len(orders)
+    return score, deliv_max, score / num_orders, num_orders
 
 
 def fileToCommands(path):

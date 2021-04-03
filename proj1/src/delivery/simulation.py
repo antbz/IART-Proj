@@ -41,9 +41,10 @@ class Simulation:
 
         print(f"\nSolving took: {time() - start}")
 
-        score, max_turn, average = self.evaluate()
+        score, max_turn, average, num_orders = self.evaluate()
         print(f"Total score: {score}")
         print(f"Number of turns: {max_turn}")
+        print(f"Number of completed orders: {num_orders}")
         print(f"Average order's score: {average}")
 
         self.chromosome.write_to_file(out_file)

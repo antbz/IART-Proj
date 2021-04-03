@@ -126,10 +126,11 @@ def run_eval():
         return
 
     simulation = parseInput("../input/" + input_file)
-    score, max_turn, average = evaluate(simulation, fileToCommands("../output/" + out_file))
+    score, max_turn, average, num_orders = evaluate(simulation, fileToCommands("../output/" + out_file))
 
     print(f"\nTotal score: {score}")
     print(f"Number of turns: {max_turn}")
+    print(f"Number of completed orders: {num_orders}")
     print(f"Average orders' score: {average}")
 
     press()
